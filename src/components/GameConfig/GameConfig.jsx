@@ -15,7 +15,8 @@ const GameConfig = props => {
             <Form.Select aria-label="Square count" className="w-auto" onChange={handleCountChange}>
                 <option value='[0,0]'>Select a square count</option>
                 {gridOptions.map(option => (
-                    <option value={'[' + option[0] + ',' + option[1] + ']'}>{option[0] * option[1]}</option>
+                    <option value={'[' + option[0] + ',' + option[1] + ']'}
+                            key={option[0] + option[1]}>{option[0] * option[1]}</option>
                 ))}
             </Form.Select>
         </div>

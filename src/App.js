@@ -40,11 +40,11 @@ function App() {
 
             newSquares = shuffle(newSquares);
 
-            [...Array(parseInt(gridDimensions[1]))].forEach((row, i) => {
+            [...Array(gridDimensions[1])].forEach((row, i) => {
                 let rowArray = [];
 
-                [...Array(parseInt(gridDimensions[0]))].forEach((square, j) => {
-                    rowArray.push(newSquares[(i) * (j + 1)]);
+                [...Array(gridDimensions[0])].forEach((square, j) => {
+                    rowArray.push(newSquares[i * gridDimensions[0] + j]);
                 });
 
                 gridSquares.push(rowArray);
