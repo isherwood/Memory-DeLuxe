@@ -1,0 +1,42 @@
+.square-outer {
+    flex: 1;
+    margin: .25rem;
+    position: relative;
+}
+
+.square-inner {
+    background-size: cover;
+    background-position: center;
+    padding-bottom: 66.67%;
+    counter-increment: line-number;
+    cursor: pointer;
+}
+
+.square-inner::before {
+    content: counter(line-number);
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background: #ccc;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: #777;
+    font-size: 3rem;
+    transition: all 0.3s;
+    cursor: pointer;
+}
+
+.square-inner:hover::before {
+    color: #000;
+}
+
+.square-inner.in {
+    pointer-events: none;
+}
+.square-inner.in::before {
+    opacity: 0;
+    pointer-events: none;
+}

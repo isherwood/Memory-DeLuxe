@@ -26,31 +26,37 @@ function App() {
     useEffect(() => {
         const getSquares = count => {
             setSquares([]);
+            let imgUrls = [];
             let newSquares = [];
-            let gridSquares = [];
 
             [...Array(parseInt(count))].forEach(() => {
                 const seed = Math.floor(Math.random() * 9999) + 1;
                 const imgUrl = 'https://picsum.photos/seed/' + seed + '/300/200';
 
                 // add each image twice
-                newSquares.push(imgUrl);
-                newSquares.push(imgUrl);
+                imgUrls.push(imgUrl);
+                imgUrls.push(imgUrl);
             });
 
-            newSquares = shuffle(newSquares);
+            imgUrls = shuffle(imgUrls);
 
+            // create arrays for the row count
             [...Array(gridDimensions[1])].forEach((row, i) => {
                 let rowArray = [];
 
+                // add squares to row for the column count
                 [...Array(gridDimensions[0])].forEach((square, j) => {
-                    rowArray.push(newSquares[i * gridDimensions[0] + j]);
+                    rowArray.push({
+                        url: imgUrls[i * gridDimensions[0] + j],
+                        shown: false,
+                        matched: false
+                    });
                 });
 
-                gridSquares.push(rowArray);
+                newSquares.push(rowArray);
             });
 
-            setSquares(gridSquares);
+            setSquares(newSquares);
         }
 
         if (Array.isArray(gridDimensions)) {
