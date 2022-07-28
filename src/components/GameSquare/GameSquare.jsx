@@ -7,26 +7,16 @@ const GameSquare = props => {
         backgroundImage: 'url(' + props.square.url + ')'
     }
 
-    const handleOuterClick = () => {
-        const innerEls = document.querySelectorAll('.square-inner');
-        innerEls.forEach(el => {
-            el.classList.remove('in');
-        })
-    }
-
-    const handleInnerClick = event => {
-        const visibleSquares = document.querySelectorAll(('.square-inner.in')).length;
-
-        event.stopPropagation();
-
-        if (visibleSquares < 2) {
-            event.currentTarget.classList.add('in');
-        }
+    const handleSquareClick = (event, square) => {
+        props.onSquareClick(event, square);
     }
 
     return (
-        <div className='square-outer' onClick={handleOuterClick}>
-            <div className='square-inner' style={innerStyles} onClick={handleInnerClick}></div>
+        <div className='square-outer'>
+            <div
+                className={'square-inner' + (props.square.shown ? ' shown' : ' ') + (props.square.matched ? ' matched' : '')}
+                style={innerStyles}
+                onClick={event => handleSquareClick(event, props.square)}></div>
         </div>
     );
 }

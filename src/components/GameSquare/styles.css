@@ -29,14 +29,14 @@
     cursor: pointer;
 }
 
-.square-inner:hover::before {
+.square-inner:hover:not(.matched)::before {
     color: #000;
 }
 
-.square-inner.in {
-    pointer-events: none;
-}
-.square-inner.in::before {
+.square-inner.shown::before {
     opacity: 0;
-    pointer-events: none;
+}
+
+.square-inner.matched::before {
+    opacity: .65;
 }

@@ -4,20 +4,29 @@ import './styles.css';
 import GameSquare from "../GameSquare/GameSquare";
 
 const GameBoard = props => {
-    const styles = {
-        margin: '-.25rem'
+    const colCount = props.gridDimensions[0];
+    const rowCount = props.gridDimensions[1];
+
+    const handleSquareClick = (event, square) => {
+        props.onSquareClick(event, square);
     }
 
     return (
-        <div id='gameBoard' className='mt-3' style={styles}>
-            {props.squares.map((row, i) => (
-                <div className='d-flex' key={row[i].url + i}>
-                    {row.map((square, j) => (
-                        <GameSquare square={square} key={square.url + i + j}/>
+        <>
+            {props.squares.length === colCount * rowCount &&
+                <div id='gameBoard' className='mt-3'>
+                    {[...Array(rowCount)].map((v, i) => (
+                        <div className='d-flex' key={props.squares[i].url + i}>
+                            {[...Array(colCount)].map((v, j) => (
+                                <GameSquare square={props.squares[i * colCount + j]}
+                                            key={i * colCount + j}
+                                            onSquareClick={handleSquareClick}/>
+                            ))}
+                        </div>
                     ))}
                 </div>
-            ))}
-        </div>
+            }
+        </>
     );
 }
 

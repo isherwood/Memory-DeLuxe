@@ -7,8 +7,9 @@ import GameConfig from "./components/GameConfig/GameConfig";
 
 function App() {
     const [squares, setSquares] = useState([]);
-    const [squaresLocked, setSquaresLocked] = useState(false);
-    const [gridDimensions, setGridDimensions] = useState();
+    const [firstSquare, setFirstSquare] = useState({});
+    const [secondSquare, setSecondSquare] = useState({});
+    const [gridDimensions, setGridDimensions] = useState([0, 0]);
 
     const shuffle = array => {
         for (let i = array.length - 1; i > 0; i--) {
@@ -19,43 +20,89 @@ function App() {
         return array;
     }
 
-    const startGame = () => {
-        setSquaresLocked(true);
+    const handleSquareClick = (event, square) => {
+        const shownSquareCount = squares.filter(square => square.shown === true).length;
+
+        if (!shownSquareCount) {
+            setFirstSquare(square);
+        }
+
+        if (shownSquareCount < 2) {
+            setSquares(current => current.map(obj => {
+                if (obj.id === square.id) {
+                    return {...obj, shown: true}
+                }
+
+                return obj;
+            }));
+        }
+
+        if (shownSquareCount === 1) {
+            setSecondSquare(square);
+        }
+
+        if (shownSquareCount === 2) {
+            setFirstSquare({});
+            setSecondSquare({});
+            setSquares(current => current.map(obj => {
+                    return {...obj, shown: false}
+                })
+            );
+        }
     }
+
+    useEffect(() => {
+        if (firstSquare['url'] === secondSquare['url']) {
+            // set the first square matched property to true
+            setSquares(current => current.map(obj => {
+                if (obj.id === firstSquare['id'] || obj.id === secondSquare['id']) {
+                    return {...obj, matched: true}
+                }
+
+                return obj;
+            }));
+
+            // set the second square matched property to true
+            setSquares(current => current.map(obj => {
+                if (obj.id === firstSquare['id'] || obj.id === secondSquare['id']) {
+                    return {...obj, matched: true}
+                }
+
+                return obj;
+            }));
+
+            // set the shown property of all squares to false
+            setSquares(current => current.map(obj => {
+                return {...obj, shown: false}
+            }));
+        }
+    }, [firstSquare, secondSquare]);
 
     useEffect(() => {
         const getSquares = count => {
             setSquares([]);
-            let imgUrls = [];
             let newSquares = [];
 
-            [...Array(parseInt(count))].forEach(() => {
+            [...Array(count)].forEach((v, i) => {
                 const seed = Math.floor(Math.random() * 9999) + 1;
                 const imgUrl = 'https://picsum.photos/seed/' + seed + '/300/200';
 
                 // add each image twice
-                imgUrls.push(imgUrl);
-                imgUrls.push(imgUrl);
-            });
-
-            imgUrls = shuffle(imgUrls);
-
-            // create arrays for the row count
-            [...Array(gridDimensions[1])].forEach((row, i) => {
-                let rowArray = [];
-
-                // add squares to row for the column count
-                [...Array(gridDimensions[0])].forEach((square, j) => {
-                    rowArray.push({
-                        url: imgUrls[i * gridDimensions[0] + j],
-                        shown: false,
-                        matched: false
-                    });
+                newSquares.push({
+                    id: i + 'a',
+                    url: imgUrl,
+                    shown: false,
+                    matched: false
                 });
-
-                newSquares.push(rowArray);
+                newSquares.push({
+                    id: i + 'b',
+                    url: imgUrl,
+                    shown: false,
+                    matched: false
+                });
             });
 
+            newSquares = shuffle(newSquares);
             setSquares(newSquares);
         }
 
@@ -68,16 +115,17 @@ function App() {
         <Container fluid>
             <Row>
                 <GameConfig
-                    onSquareCountChange={(grid) => setGridDimensions(JSON.parse(grid))}
-                    squaresLocked={squaresLocked}
-                    onStartGame={startGame}
-                />
+                    onSquareCountChange={(grid) => setGridDimensions(JSON.parse(grid))}/>
             </Row>
 
-            <Row>
-                <GameBoard
-                    squares={squares}/>
-            </Row>
+            {squares.length > 0 &&
+                <Row>
+                    <GameBoard
+                        squares={squares}
+                        gridDimensions={gridDimensions}
+                        onSquareClick={handleSquareClick}/>
+                </Row>
+            }
         </Container>
     );
 }
