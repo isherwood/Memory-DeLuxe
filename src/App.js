@@ -23,10 +23,13 @@ function App() {
     const handleSquareClick = (event, square) => {
         const shownSquareCount = squares.filter(square => square.shown === true).length;
 
+        // set first square on first click
         if (!shownSquareCount) {
             setFirstSquare(square);
+            setSecondSquare({});
         }
 
+        // show clicked square on first two clicks
         if (shownSquareCount < 2) {
             setSquares(current => current.map(obj => {
                 if (obj.id === square.id) {
@@ -37,17 +40,19 @@ function App() {
             }));
         }
 
-        if (shownSquareCount === 1) {
+        // set second square on second click if it's not the first square
+        if (shownSquareCount === 1 && square.id !== firstSquare.id) {
             setSecondSquare(square);
         }
 
+        // clear shown and set squares on third click
         if (shownSquareCount === 2) {
+            setSquares(current => current.map(obj => {
+                return {...obj, shown: false}
+            }));
+
             setFirstSquare({});
             setSecondSquare({});
-            setSquares(current => current.map(obj => {
-                    return {...obj, shown: false}
-                })
-            );
         }
     }
 
@@ -62,7 +67,7 @@ function App() {
                 return obj;
             }));
 
-            // set the second square matched property to true
+            // repeat to set the second square matched property to true
             setSquares(current => current.map(obj => {
                 if (obj.id === firstSquare['id'] || obj.id === secondSquare['id']) {
                     return {...obj, matched: true}

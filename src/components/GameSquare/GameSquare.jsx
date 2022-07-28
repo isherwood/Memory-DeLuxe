@@ -14,7 +14,7 @@ const GameSquare = props => {
     return (
         <div className='square-outer'>
             <div
-                className={'square-inner' + (props.square.shown ? ' shown' : ' ') + (props.square.matched ? ' matched' : '')}
+                className={'square-inner' + (props.square.shown ? ' shown' : '') + (props.square.matched ? ' matched' : '')}
                 style={innerStyles}
                 onClick={event => handleSquareClick(event, props.square)}></div>
         </div>

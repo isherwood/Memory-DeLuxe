@@ -25,8 +25,8 @@
     align-items: center;
     color: #777;
     font-size: 3rem;
-    transition: all 0.3s;
     cursor: pointer;
+    transition: all .3s;
 }
 
 .square-inner:hover:not(.matched)::before {
@@ -39,4 +39,26 @@
 
 .square-inner.matched::before {
     opacity: .65;
+    animation: opacityAnimation;
+    animation-duration: .5s;
+    animation-delay: .5s;
+    cursor: default;
+}
+
+@keyframes opacityAnimation {
+    0% {
+        opacity: .65;
+    }
+    25% {
+        opacity: 0;
+    }
+    50% {
+        opacity: .65;
+    }
+    75% {
+        opacity: 0;
+    }
+    100% {
+        opacity: .65;
+    }
 }
