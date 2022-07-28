@@ -1,5 +1,6 @@
 import React from "react";
 import {Form} from 'react-bootstrap';
+import ButtonWithConfirm from "../ButtonWithConfirm/ButtonWithConfirm";
 
 const GameConfig = props => {
     const handleCountChange = e => {
@@ -31,10 +32,10 @@ const GameConfig = props => {
                     Start Game
                 </button>
 
-                <button className={'btn btn-danger btn-xl' + (!props.gameLocked ? ' d-none' : '')}
-                        onClick={props.onEndButtonClick}>
-                    End Game
-                </button>
+                <ButtonWithConfirm variant="danger" size="xl" value='End Game'
+                                   classes={(!props.gameLocked ? ' d-none' : '')}
+                                   modalBody={<>Are you sure you want to end the game?</>}
+                                   onYes={() => props.onEndButtonClick()}/>
             </div>
         </div>
     );
