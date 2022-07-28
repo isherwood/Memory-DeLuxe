@@ -9,7 +9,7 @@
     background-position: center;
     padding-bottom: 66.67%;
     counter-increment: line-number;
-    cursor: pointer;
+    cursor: not-allowed;
 }
 
 .square-inner::before {
@@ -25,11 +25,14 @@
     align-items: center;
     color: #777;
     font-size: 3rem;
-    cursor: pointer;
     transition: all .3s;
 }
 
-.square-inner:hover:not(.matched)::before {
+.game-locked .square-inner {
+    cursor: pointer;
+}
+
+.game-locked .square-inner:hover:not(.matched)::before {
     color: #000;
 }
 
@@ -38,24 +41,22 @@
 }
 
 .square-inner.matched::before {
-    opacity: .65;
+    opacity: 0;
     animation: opacityAnimation;
     animation-duration: .5s;
     animation-delay: .5s;
-    cursor: default;
+    animation-fill-mode: forwards;
+    cursor: not-allowed;
 }
 
 @keyframes opacityAnimation {
     0% {
-        opacity: .65;
-    }
-    25% {
         opacity: 0;
     }
-    50% {
+    33% {
         opacity: .65;
     }
-    75% {
+    67% {
         opacity: 0;
     }
     100% {

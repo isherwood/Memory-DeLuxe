@@ -10,6 +10,7 @@ function App() {
     const [firstSquare, setFirstSquare] = useState({});
     const [secondSquare, setSecondSquare] = useState({});
     const [gridDimensions, setGridDimensions] = useState([0, 0]);
+    const [gameLocked, setGameLocked] = useState(false);
 
     const shuffle = array => {
         for (let i = array.length - 1; i > 0; i--) {
@@ -21,43 +22,63 @@ function App() {
     }
 
     const handleSquareClick = (event, square) => {
-        const shownSquareCount = squares.filter(square => square.shown === true).length;
+        if (gameLocked) {
+            const shownSquareCount = squares.filter(square => square.shown === true).length;
 
-        // set first square on first click
-        if (!shownSquareCount) {
-            setFirstSquare(square);
-            setSecondSquare({});
-        }
+            // set first square on first click
+            if (!shownSquareCount) {
+                setFirstSquare(square);
+                setSecondSquare({});
+            }
 
-        // show clicked square on first two clicks
-        if (shownSquareCount < 2) {
-            setSquares(current => current.map(obj => {
-                if (obj.id === square.id) {
-                    return {...obj, shown: true}
-                }
+            // show clicked square on first two clicks
+            if (shownSquareCount < 2) {
+                setSquares(current => current.map(obj => {
+                    if (obj.id === square.id) {
+                        return {...obj, shown: true}
+                    }
 
-                return obj;
-            }));
-        }
+                    return obj;
+                }));
+            }
 
-        // set second square on second click if it's not the first square
-        if (shownSquareCount === 1 && square.id !== firstSquare.id) {
-            setSecondSquare(square);
-        }
+            // set second square on second click if it's not the first square
+            if (shownSquareCount === 1 && square.id !== firstSquare.id) {
+                setSecondSquare(square);
+            }
 
-        // clear shown and set squares on third click
-        if (shownSquareCount === 2) {
-            setSquares(current => current.map(obj => {
-                return {...obj, shown: false}
-            }));
+            // clear shown and set squares on third click
+            if (shownSquareCount === 2) {
+                setSquares(current => current.map(obj => {
+                    return {...obj, shown: false}
+                }));
 
-            setFirstSquare({});
-            setSecondSquare({});
+                setFirstSquare({});
+                setSecondSquare({});
+            }
         }
     }
 
+    const handleStartButtonClick = () => {
+        setGameLocked(true);
+
+        // reset grid to current dimensions to fetch new images
+        const currentGridDimensions = gridDimensions;
+        setGridDimensions([0,0]);
+        setTimeout(() => {
+            setGridDimensions(currentGridDimensions);
+        });
+    }
+
+    const handleEndButtonClick = () => {
+        setGameLocked(false);
+    }
+
     useEffect(() => {
+
+        // check for a match
         if (firstSquare['url'] === secondSquare['url']) {
+
             // set the first square matched property to true
             setSquares(current => current.map(obj => {
                 if (obj.id === firstSquare['id'] || obj.id === secondSquare['id']) {
@@ -117,10 +138,14 @@ function App() {
     }, [gridDimensions]);
 
     return (
-        <Container fluid>
+        <Container fluid className={(gameLocked ? 'game-locked' : '')}>
             <Row>
                 <GameConfig
-                    onSquareCountChange={(grid) => setGridDimensions(JSON.parse(grid))}/>
+                    onSquareCountChange={(grid) => setGridDimensions(JSON.parse(grid))}
+                    gameLocked={gameLocked}
+                    gridDimensions={gridDimensions}
+                    onStartButtonClick={handleStartButtonClick}
+                    onEndButtonClick={handleEndButtonClick}/>
             </Row>
 
             {squares.length > 0 &&
