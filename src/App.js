@@ -175,7 +175,7 @@ function App() {
     }, [players])
 
     return (
-        <Container fluid className={(gameLocked ? 'game-locked' : '')}>
+        <Container fluid className={'d-flex flex-column vh-100' + (gameLocked ? ' game-locked' : '')}>
             <Row>
                 <GameConfig
                     onSquareCountChange={(grid) => setGridDimensions(JSON.parse(grid))}
@@ -189,7 +189,7 @@ function App() {
             </Row>
 
             {squares.length > 0 &&
-                <Row>
+                <Row className='flex-fill'>
                     <GameBoard
                         squares={squares}
                         gridDimensions={gridDimensions}
