@@ -11,6 +11,8 @@ function App() {
     const [secondSquare, setSecondSquare] = useState({});
     const [gridDimensions, setGridDimensions] = useState([0, 0]);
     const [gameLocked, setGameLocked] = useState(false);
+    const [players, setPlayers] = useState([]);
+    const [currentPlayer, setCurrentPlayer] = useState();
 
     const shuffle = array => {
         for (let i = array.length - 1; i > 0; i--) {
@@ -64,14 +66,29 @@ function App() {
 
         // reset grid to current dimensions to fetch new images
         const currentGridDimensions = gridDimensions;
-        setGridDimensions([0,0]);
+        setGridDimensions([0, 0]);
         setTimeout(() => {
             setGridDimensions(currentGridDimensions);
         });
+
+        // set the first player as active
+        if (players.length) {
+            const tempPlayers = [...players];
+            tempPlayers[0].active = true;
+            setPlayers(tempPlayers);
+        }
     }
 
     const handleEndButtonClick = () => {
         setGameLocked(false);
+    }
+
+    const handleAddPlayer = (name) => {
+        setPlayers(players => [...players, {name: name}]);
+    }
+
+    const handleRemovePlayer = name => {
+        setPlayers(players.filter(player => player.name !== name));
     }
 
     useEffect(() => {
@@ -101,8 +118,20 @@ function App() {
             setSquares(current => current.map(obj => {
                 return {...obj, shown: false}
             }));
+
+            // increment current player score
+            setPlayers(current => current.map(obj => {
+                if (obj.name === currentPlayer['name']) {
+                    return {...obj, score: currentPlayer['score'] + 1}
+                }
+
+                return obj;
+            }));
+        } else {
+
+            // move to the next player
         }
-    }, [firstSquare, secondSquare]);
+    }, [currentPlayer, firstSquare, secondSquare]);
 
     useEffect(() => {
         const getSquares = count => {
@@ -137,6 +166,14 @@ function App() {
         }
     }, [gridDimensions]);
 
+    useEffect(() => {
+        const activePlayer = players.filter(player => player.active)[0];
+
+        if (activePlayer) {
+            setCurrentPlayer(activePlayer.name);
+        }
+    }, [players])
+
     return (
         <Container fluid className={(gameLocked ? 'game-locked' : '')}>
             <Row>
@@ -144,6 +181,9 @@ function App() {
                     onSquareCountChange={(grid) => setGridDimensions(JSON.parse(grid))}
                     gameLocked={gameLocked}
                     gridDimensions={gridDimensions}
+                    players={players}
+                    addPlayer={handleAddPlayer}
+                    removePlayer={handleRemovePlayer}
                     onStartButtonClick={handleStartButtonClick}
                     onEndButtonClick={handleEndButtonClick}/>
             </Row>
