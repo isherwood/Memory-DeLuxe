@@ -140,7 +140,7 @@ function App() {
 
             [...Array(count)].forEach((v, i) => {
                 const seed = Math.floor(Math.random() * 9999) + 1;
-                const imgUrl = 'https://picsum.photos/seed/' + seed + '/300/200';
+                const imgUrl = 'https://picsum.photos/seed/' + seed + '/600/400';
 
                 // add each image twice
                 newSquares.push({

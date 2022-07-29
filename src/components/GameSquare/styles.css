@@ -7,7 +7,6 @@
 .square-inner {
     background-size: cover;
     background-position: center;
-    padding-bottom: 66.67%;
     counter-increment: line-number;
     cursor: not-allowed;
 }

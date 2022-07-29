@@ -14,9 +14,9 @@ const GameBoard = props => {
     return (
         <>
             {props.squares.length === colCount * rowCount &&
-                <div id='gameBoard' className='mt-3'>
+                <div id='gameBoard' className='my-3 d-flex flex-column align-items-stretch'>
                     {[...Array(rowCount)].map((v, i) => (
-                        <div className='d-flex' key={props.squares[i].url + i}>
+                        <div className='d-flex flex-fill' key={props.squares[i].url + i}>
                             {[...Array(colCount)].map((v, j) => (
                                 <GameSquare square={props.squares[i * colCount + j]}
                                             key={i * colCount + j}
