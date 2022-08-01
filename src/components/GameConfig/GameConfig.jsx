@@ -1,11 +1,10 @@
-import React, {useState} from "react";
+import React, {useEffect, useRef, useState} from "react";
 import {Button, Col, Form, Row} from 'react-bootstrap';
 import ButtonWithConfirm from "../ButtonWithConfirm/ButtonWithConfirm";
 
 const GameConfig = props => {
-    const [showPlayers, setShowPlayers] = useState(false);
     const [name, setName] = useState('');
-    const nameInput = React.createRef();
+    const nameInputRef = useRef(null);
 
     const handleCountChange = e => {
         props.onBoxCountChange(e.currentTarget.value);
@@ -27,18 +26,14 @@ const GameConfig = props => {
     ]
 
     const handleShowPlayers = () => {
-        setShowPlayers(!showPlayers);
-
-        // setTimeout(() => {
-        //     nameInput.current.focus();
-        // });
+        props.onSetShowPlayers(!props.showPlayers);
     }
 
     const handleAddPlayer = () => {
         if (name && !props.players.filter(player => player.name === name).length) {
             props.addPlayer(name);
             setName('');
-            nameInput.current.focus();
+            nameInputRef.current.focus();
         }
     }
 
@@ -47,6 +42,12 @@ const GameConfig = props => {
             handleAddPlayer();
         }
     }
+
+    useEffect(() => {
+        if (props.showPlayers) {
+            nameInputRef.current.focus();
+        }
+    }, [props.showPlayers]);
 
     return (
         <>
@@ -101,7 +102,7 @@ const GameConfig = props => {
                 </div>
             </div>
 
-            {showPlayers && !props.gameLocked &&
+            {props.showPlayers && !props.gameLocked &&
                 <div className='mt-3'>
                     <p>Optionally add two or more players to track game order and score. Names must be unique.</p>
 
@@ -110,7 +111,7 @@ const GameConfig = props => {
                             <Form.Control type='text' placeholder='Enter player name' value={name}
                                           onChange={event => setName(event.target.value)}
                                           onKeyUp={handleNameInputKeyup}
-                                          ref={nameInput}/>
+                                          ref={nameInputRef}/>
                         </Col>
 
                         <Col>

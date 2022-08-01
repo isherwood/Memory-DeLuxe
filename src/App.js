@@ -12,6 +12,7 @@ function App() {
     const [gridDimensions, setGridDimensions] = useState([0, 0]);
     const [gameLocked, setGameLocked] = useState(false);
     const [players, setPlayers] = useState([]);
+    const [showPlayers, setShowPlayers] = useState(false);
     const [currentPlayer, setCurrentPlayer] = useState();
     const [gameEnded, setGameEnded] = useState(false);
 
@@ -95,6 +96,7 @@ function App() {
 
     const handleEndButtonClick = () => {
         setGameLocked(false);
+        setShowPlayers(false);
     }
 
     const handleAddPlayer = (name) => {
@@ -250,11 +252,13 @@ function App() {
                     gameLocked={gameLocked}
                     gridDimensions={gridDimensions}
                     players={players}
+                    showPlayers={showPlayers}
                     currentPlayer={currentPlayer}
                     addPlayer={handleAddPlayer}
                     removePlayer={handleRemovePlayer}
                     onStartButtonClick={handleStartButtonClick}
-                    onEndButtonClick={handleEndButtonClick}/>
+                    onEndButtonClick={handleEndButtonClick}
+                    onSetShowPlayers={setShowPlayers}/>
             </Row>
 
             {boxes.length > 0 &&
