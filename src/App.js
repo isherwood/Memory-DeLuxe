@@ -267,7 +267,7 @@ function App() {
                     guessCount={guessCount}/>
             </Row>
 
-            <Row className='flex-fill align-items-center'>
+            <Row className='flex-fill'>
                 {boxes.length > 0 ?
                     <GameBoard
                         boxes={boxes}
@@ -275,7 +275,7 @@ function App() {
                         onBoxClick={handleBoxClick}
                         gameComplete={gameComplete}/>
                     :
-                    <div className='text-center text-muted opacity-50'>
+                    <div className='align-self-center mb-4 text-center text-muted opacity-50'>
                         <div className='display-1 fst-italic'>Memory Deluxe</div>
                         <div className='mt-2'>A SeaBee Software production</div>
                     </div>
