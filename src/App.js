@@ -276,7 +276,7 @@ function App() {
                         gameComplete={gameComplete}/>
                     :
                     <div className='align-self-center mb-4 text-center text-muted opacity-50'>
-                        <div className='display-1 fst-italic'>Memory Deluxe</div>
+                        <div className='display-1 fst-italic'>Memory De Luxe</div>
                         <div className='mt-2'>A SeaBee Software production</div>
                     </div>
                 }
