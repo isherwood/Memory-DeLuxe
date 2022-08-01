@@ -15,7 +15,7 @@ const GameBoard = props => {
         <>
             {props.boxes.length === colCount * rowCount &&
                 <div id='gameBoard' className={'my-3 d-flex flex-column align-items-stretch' +
-                    (props.gameEnded ? ' game-ended' : '')}>
+                    (props.gameComplete ? ' game-ended' : '')}>
                     {[...Array(rowCount)].map((v, i) => (
                         <div className='d-flex flex-fill' key={props.boxes[i].url + i}>
                             {[...Array(colCount)].map((v, j) => (

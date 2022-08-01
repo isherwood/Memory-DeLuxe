@@ -14,7 +14,7 @@ function App() {
     const [players, setPlayers] = useState([]);
     const [showPlayers, setShowPlayers] = useState(false);
     const [currentPlayer, setCurrentPlayer] = useState();
-    const [gameEnded, setGameEnded] = useState(false);
+    const [gameComplete, setGameComplete] = useState(false);
 
     const shuffle = array => {
         for (let i = array.length - 1; i > 0; i--) {
@@ -70,8 +70,13 @@ function App() {
     }
 
     const handleStartButtonClick = () => {
-        setGameEnded(false);
+        setGameComplete(false);
         setGameLocked(true);
+    }
+
+    const handleEndButtonClick = () => {
+        setGameLocked(false);
+        setShowPlayers(false);
 
         // reset grid to current dimensions to fetch new images
         const currentGridDimensions = gridDimensions;
@@ -92,11 +97,6 @@ function App() {
 
             return obj;
         }));
-    }
-
-    const handleEndButtonClick = () => {
-        setGameLocked(false);
-        setShowPlayers(false);
     }
 
     const handleAddPlayer = (name) => {
@@ -233,13 +233,13 @@ function App() {
         // eslint-disable-next-line
     }, [secondBox]);
 
-    // check for game end
+    // check for game completion
     useEffect(() => {
         if (boxes.length) {
             const unmatchedBoxes = boxes.filter(box => !box.matched);
 
             if (!unmatchedBoxes.length) {
-                setGameEnded(true);
+                setGameComplete(true);
             }
         }
     }, [boxes]);
@@ -267,7 +267,7 @@ function App() {
                         boxes={boxes}
                         gridDimensions={gridDimensions}
                         onBoxClick={handleBoxClick}
-                        gameEnded={gameEnded}/>
+                        gameComplete={gameComplete}/>
                 </Row>
             }
         </Container>
