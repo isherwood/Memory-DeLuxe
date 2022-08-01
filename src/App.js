@@ -70,11 +70,11 @@ function App() {
     }
 
     const handleStartButtonClick = () => {
-        setGameComplete(false);
         setGameLocked(true);
     }
 
     const handleEndButtonClick = () => {
+        setGameComplete(false);
         setGameLocked(false);
         setShowPlayers(false);
 
