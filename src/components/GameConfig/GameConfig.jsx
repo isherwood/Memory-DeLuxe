@@ -104,7 +104,7 @@ const GameConfig = props => {
                             </div>
 
                             <ButtonWithConfirm variant="danger" value='End Game'
-                                               classes={(!props.gameLocked ? ' d-none' : '')}
+                                               classes={'btn-xl' + (!props.gameLocked ? ' d-none' : '')}
                                                modalBody={<>Are you sure you want to end the game?</>}
                                                onYes={() => props.onEndButtonClick()}/>
                         </>
