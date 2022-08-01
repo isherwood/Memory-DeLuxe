@@ -13,6 +13,7 @@ function App() {
     const [gameLocked, setGameLocked] = useState(false);
     const [players, setPlayers] = useState([]);
     const [currentPlayer, setCurrentPlayer] = useState();
+    const [gameEnded, setGameEnded] = useState(false);
 
     const shuffle = array => {
         for (let i = array.length - 1; i > 0; i--) {
@@ -27,7 +28,7 @@ function App() {
         if (gameLocked) {
             const shownBoxCount = boxes.filter(box => box.shown === true).length;
 
-            // set first box on first click
+            // set first box on first click & clear second box
             if (!shownBoxCount && !box.matched) {
                 setFirstBox(box);
                 setSecondBox({});
@@ -68,6 +69,7 @@ function App() {
     }
 
     const handleStartButtonClick = () => {
+        setGameEnded(false);
         setGameLocked(true);
 
         // reset grid to current dimensions to fetch new images
@@ -229,6 +231,17 @@ function App() {
         // eslint-disable-next-line
     }, [secondBox]);
 
+    // check for game end
+    useEffect(() => {
+        if (boxes.length) {
+            const unmatchedBoxes = boxes.filter(box => !box.matched);
+
+            if (!unmatchedBoxes.length) {
+                setGameEnded(true);
+            }
+        }
+    }, [boxes]);
+
     return (
         <Container fluid className={'d-flex flex-column vh-100' + (gameLocked ? ' game-locked' : '')}>
             <Row>
@@ -249,7 +262,8 @@ function App() {
                     <GameBoard
                         boxes={boxes}
                         gridDimensions={gridDimensions}
-                        onBoxClick={handleBoxClick}/>
+                        onBoxClick={handleBoxClick}
+                        gameEnded={gameEnded}/>
                 </Row>
             }
         </Container>

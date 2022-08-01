@@ -47,14 +47,20 @@
 
 .box-inner.matched::before {
     opacity: 0;
-    animation: opacityAnimation;
+    animation: opacityInOutIn;
     animation-duration: .5s;
     animation-delay: .5s;
     animation-fill-mode: forwards;
     cursor: not-allowed;
 }
 
-@keyframes opacityAnimation {
+.game-ended .box-inner::before {
+    animation: opacityInOutIn .5s ease .5s, opacityIn 3s ease 2s;
+    animation-fill-mode: forwards;
+    cursor: default;
+}
+
+@keyframes opacityInOutIn {
     0% {
         opacity: 0;
     }
@@ -66,5 +72,14 @@
     }
     100% {
         opacity: .65;
+    }
+}
+
+@keyframes opacityIn {
+    0% {
+        opacity: .65;
+    }
+    100% {
+        opacity: .0;
     }
 }
