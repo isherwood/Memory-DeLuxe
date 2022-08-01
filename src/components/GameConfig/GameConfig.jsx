@@ -8,11 +8,22 @@ const GameConfig = props => {
     const nameInput = React.createRef();
 
     const handleCountChange = e => {
-        props.onSquareCountChange(e.currentTarget.value);
+        props.onBoxCountChange(e.currentTarget.value);
     }
 
     const gridOptions = [
-        [3, 2], [4, 3], [5, 4], [6, 5], [7, 6], [8, 7]
+        [3, 2],
+        [2, 6], [3, 4], [4, 3],
+        [4, 4],
+        [3, 6], [6, 3],
+        [4, 5], [5, 4],
+        [3, 8], [4, 6], [6, 4], [8, 3],
+        [3, 10], [5, 6], [6, 5], [10, 3],
+        [4, 9], [6, 6], [9, 4],
+        [4, 10], [5, 8], [8, 5], [10, 4],
+        [6, 7], [7, 6],
+        [7, 8], [8, 7],
+        [8, 8]
     ]
 
     const handleShowPlayers = () => {
@@ -24,7 +35,7 @@ const GameConfig = props => {
     }
 
     const handleAddPlayer = () => {
-        if (name && !props.players.includes(name)) {
+        if (name && !props.players.filter(player => player.name === name).length) {
             props.addPlayer(name);
             setName('');
             nameInput.current.focus();
@@ -43,16 +54,18 @@ const GameConfig = props => {
                 {!props.gameLocked &&
                     <>
                         <div className='form-floating'>
-                            <Form.Select id="squareCount" className="w-auto"
+                            <Form.Select id="boxCount" className="w-auto"
                                          onChange={handleCountChange}
                                          disabled={props.gameLocked}>
-                                <option value='[0,0]'>Select a square count</option>
-                                {gridOptions.map(option => (
-                                    <option value={'[' + option[0] + ',' + option[1] + ']'}
-                                            key={option[0] + option[1]}>{option[0] * option[1]}</option>
+                                <option value='[0,0]'>Select a box count</option>
+                                {gridOptions.map((option, i) => (
+                                    <option key={i}
+                                            value={'[' + option[0] + ',' + option[1] + ']'}>
+                                        {option[0] * option[1]} ({option[0]} x {option[1]})
+                                    </option>
                                 ))}
                             </Form.Select>
-                            <Form.Label htmlFor="squareCount">Square Count</Form.Label>
+                            <Form.Label htmlFor="boxCount">Box Count</Form.Label>
                         </div>
 
                         <Button variant='primary' className='btn-xl ms-2'
@@ -62,20 +75,26 @@ const GameConfig = props => {
 
                 {props.gameLocked && props.currentPlayer &&
                     <div className='lead'>
-                        <p>Current player: <b>{props.currentPlayer}</b></p>
-
-                        <p>Scores: </p>
+                        {props.players.map(player => (
+                            <span
+                                className={'badge fw-normal me-2' + (
+                                    player.name === props.currentPlayer ?
+                                        ' bg-primary shadow shadow-dark'
+                                        : ' bg-secondary')}
+                                key={player.name}>
+                                {player.name} {player.score}</span>
+                        ))}
                     </div>
                 }
 
                 <div className='ms-auto'>
-                    <button className={'btn btn-primary btn-xl' + (props.gameLocked ? ' d-none' : '')}
+                    <button className={'btn btn-success btn-xl' + (props.gameLocked ? ' d-none' : '')}
                             onClick={props.onStartButtonClick}
                             disabled={props.gridDimensions[0] === 0}>
                         Start Game
                     </button>
 
-                    <ButtonWithConfirm variant="danger" size="xl" value='End Game'
+                    <ButtonWithConfirm variant="danger" value='End Game'
                                        classes={(!props.gameLocked ? ' d-none' : '')}
                                        modalBody={<>Are you sure you want to end the game?</>}
                                        onYes={() => props.onEndButtonClick()}/>
@@ -84,7 +103,7 @@ const GameConfig = props => {
 
             {showPlayers && !props.gameLocked &&
                 <div className='mt-3'>
-                    <p>Optionally add players to track game order and score. Names must be unique.</p>
+                    <p>Optionally add two or more players to track game order and score. Names must be unique.</p>
 
                     <Row>
                         <Col>
@@ -99,6 +118,10 @@ const GameConfig = props => {
                                     onClick={handleAddPlayer}><b>+</b></Button>
                         </Col>
                     </Row>
+
+                    {props.players.length > 0 &&
+                        <h3 className='lead my-3'>Players</h3>
+                    }
 
                     {props.players.map(player => (
                         <Row className='mt-2 px-2' key={player.name}>

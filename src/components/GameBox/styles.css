@@ -1,17 +1,17 @@
-.square-outer {
+.box-outer {
     flex: 1;
     margin: .25rem;
     position: relative;
 }
 
-.square-inner {
+.box-inner {
     background-size: cover;
     background-position: center;
     counter-increment: line-number;
     cursor: not-allowed;
 }
 
-.square-inner::before {
+.box-inner::before {
     content: counter(line-number);
     position: absolute;
     left: 0;
@@ -23,23 +23,29 @@
     justify-content: center;
     align-items: center;
     color: #777;
-    font-size: 3rem;
+    font-size: 1.5rem;
     transition: all .3s;
 }
 
-.game-locked .square-inner {
+@media (min-width: 600px) and (min-height: 500px) {
+    .box-inner::before {
+        font-size: 3rem;
+    }
+}
+
+.game-locked .box-inner {
     cursor: pointer;
 }
 
-.game-locked .square-inner:hover:not(.matched)::before {
+.game-locked .box-inner:hover:not(.matched)::before {
     color: #000;
 }
 
-.square-inner.shown::before {
+.box-inner.shown::before {
     opacity: 0;
 }
 
-.square-inner.matched::before {
+.box-inner.matched::before {
     opacity: 0;
     animation: opacityAnimation;
     animation-duration: .5s;

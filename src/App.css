@@ -1,3 +1,9 @@
-.btn.btn-xl {
-    padding: 1rem;
+@media (min-width: 500px) {
+    .btn.btn-xl {
+        padding: 1rem;
+    }
+}
+
+.shadow.shadow-dark {
+    box-shadow: 0 .5rem 1rem rgba(0, 0, 0, .75) !important;
 }

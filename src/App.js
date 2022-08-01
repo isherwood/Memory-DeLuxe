@@ -6,9 +6,9 @@ import GameBoard from "./components/GameBoard/GameBoard";
 import GameConfig from "./components/GameConfig/GameConfig";
 
 function App() {
-    const [squares, setSquares] = useState([]);
-    const [firstSquare, setFirstSquare] = useState({});
-    const [secondSquare, setSecondSquare] = useState({});
+    const [boxes, setBoxes] = useState([]);
+    const [firstBox, setFirstBox] = useState({});
+    const [secondBox, setSecondBox] = useState({});
     const [gridDimensions, setGridDimensions] = useState([0, 0]);
     const [gameLocked, setGameLocked] = useState(false);
     const [players, setPlayers] = useState([]);
@@ -23,20 +23,20 @@ function App() {
         return array;
     }
 
-    const handleSquareClick = (event, square) => {
+    const handleBoxClick = (event, box) => {
         if (gameLocked) {
-            const shownSquareCount = squares.filter(square => square.shown === true).length;
+            const shownBoxCount = boxes.filter(box => box.shown === true).length;
 
-            // set first square on first click
-            if (!shownSquareCount) {
-                setFirstSquare(square);
-                setSecondSquare({});
+            // set first box on first click
+            if (!shownBoxCount && !box.matched) {
+                setFirstBox(box);
+                setSecondBox({});
             }
 
-            // show clicked square on first two clicks
-            if (shownSquareCount < 2) {
-                setSquares(current => current.map(obj => {
-                    if (obj.id === square.id) {
+            // show clicked box on first two clicks
+            if (shownBoxCount < 2 && !box.matched) {
+                setBoxes(current => current.map(obj => {
+                    if (obj.id === box.id) {
                         return {...obj, shown: true}
                     }
 
@@ -44,19 +44,25 @@ function App() {
                 }));
             }
 
-            // set second square on second click if it's not the first square
-            if (shownSquareCount === 1 && square.id !== firstSquare.id) {
-                setSecondSquare(square);
+            // set second box on second click if it's not the first box
+            if (shownBoxCount === 1 && box.id !== firstBox.id && !box.matched) {
+                setSecondBox(box);
             }
 
-            // clear shown and set squares on third click
-            if (shownSquareCount === 2) {
-                setSquares(current => current.map(obj => {
+            // clear shown and set boxes on third click
+            if (shownBoxCount === 2) {
+
+                // advance current player if not a match
+                if (currentPlayer && firstBox['url'] !== secondBox['url']) {
+                    advanceCurrentPlayer();
+                }
+
+                setBoxes(current => current.map(obj => {
                     return {...obj, shown: false}
                 }));
 
-                setFirstSquare({});
-                setSecondSquare({});
+                setFirstBox({});
+                setSecondBox({});
             }
         }
     }
@@ -71,12 +77,18 @@ function App() {
             setGridDimensions(currentGridDimensions);
         });
 
-        // set the first player as active
-        if (players.length) {
-            const tempPlayers = [...players];
-            tempPlayers[0].active = true;
-            setPlayers(tempPlayers);
-        }
+        // zero scores & set the first player as active
+        setPlayers(current => current.map(obj => {
+            obj.active = false;
+            obj.score = 0;
+            const matchingPlayerIndex = players.findIndex(player => player.name === obj.name);
+
+            if (matchingPlayerIndex === 0) {
+                obj.active = true;
+            }
+
+            return obj;
+        }));
     }
 
     const handleEndButtonClick = () => {
@@ -84,72 +96,102 @@ function App() {
     }
 
     const handleAddPlayer = (name) => {
-        setPlayers(players => [...players, {name: name}]);
+        setPlayers(players => [...players, {name: name, score: 0}]);
     }
 
     const handleRemovePlayer = name => {
         setPlayers(players.filter(player => player.name !== name));
     }
 
-    useEffect(() => {
+    const advanceCurrentPlayer = () => {
+        // the index of the current player among all players
+        const currentPlayerIndex = players.findIndex(player => {
+            return player.active === true;
+        });
+
+        setPlayers(current => current.map(obj => {
+            // deactivate each player
+            obj.active = false;
+
+            // the index of the player who matches the currently looping player
+            const matchingPlayerIndex = players.findIndex(player => {
+                return player.name === obj.name;
+            });
+
+            // the looping player is not the last player in the array
+            if (currentPlayerIndex < players.length - 1) {
+
+                // the looping player index matches the next player's index
+                if (matchingPlayerIndex === currentPlayerIndex + 1) {
+                    obj.active = true;
+                }
+
+                // the looping player is the last in the array and the matching player is the first player
+            } else if (matchingPlayerIndex === 0) {
+                obj.active = true;
+            }
+
+            return obj;
+        }));
+    }
+
+    const checkBoxes = () => {
 
         // check for a match
-        if (firstSquare['url'] === secondSquare['url']) {
+        if (firstBox['url'] === secondBox['url']) {
 
-            // set the first square matched property to true
-            setSquares(current => current.map(obj => {
-                if (obj.id === firstSquare['id'] || obj.id === secondSquare['id']) {
+            // set the first box matched property to true
+            setBoxes(current => current.map(obj => {
+                if (obj.id === firstBox['id'] || obj.id === secondBox['id']) {
                     return {...obj, matched: true}
                 }
 
                 return obj;
             }));
 
-            // repeat to set the second square matched property to true
-            setSquares(current => current.map(obj => {
-                if (obj.id === firstSquare['id'] || obj.id === secondSquare['id']) {
+            // repeat to set the second box matched property to true
+            setBoxes(current => current.map(obj => {
+                if (obj.id === firstBox['id'] || obj.id === secondBox['id']) {
                     return {...obj, matched: true}
                 }
 
                 return obj;
             }));
 
-            // set the shown property of all squares to false
-            setSquares(current => current.map(obj => {
+            // set the shown property of all boxes to false
+            setBoxes(current => current.map(obj => {
                 return {...obj, shown: false}
             }));
 
             // increment current player score
             setPlayers(current => current.map(obj => {
-                if (obj.name === currentPlayer['name']) {
-                    return {...obj, score: currentPlayer['score'] + 1}
+                if (obj.name === currentPlayer) {
+                    return {...obj, score: obj.score + 1}
                 }
 
                 return obj;
             }));
-        } else {
-
-            // move to the next player
         }
-    }, [currentPlayer, firstSquare, secondSquare]);
+    }
 
+    // initialize boxes
     useEffect(() => {
-        const getSquares = count => {
-            setSquares([]);
-            let newSquares = [];
+        const getBoxes = count => {
+            setBoxes([]);
+            let newBoxes = [];
 
             [...Array(count)].forEach((v, i) => {
                 const seed = Math.floor(Math.random() * 9999) + 1;
                 const imgUrl = 'https://picsum.photos/seed/' + seed + '/600/400';
 
                 // add each image twice
-                newSquares.push({
+                newBoxes.push({
                     id: i + 'a',
                     url: imgUrl,
                     shown: false,
                     matched: false
                 });
-                newSquares.push({
+                newBoxes.push({
                     id: i + 'b',
                     url: imgUrl,
                     shown: false,
@@ -157,43 +199,57 @@ function App() {
                 });
             });
 
-            newSquares = shuffle(newSquares);
-            setSquares(newSquares);
+            newBoxes = shuffle(newBoxes);
+            setBoxes(newBoxes);
         }
 
         if (Array.isArray(gridDimensions)) {
-            getSquares((gridDimensions[0] * gridDimensions[1] / 2));
+            getBoxes((gridDimensions[0] * gridDimensions[1] / 2));
         }
     }, [gridDimensions]);
 
+    // set active player
     useEffect(() => {
-        const activePlayer = players.filter(player => player.active)[0];
+        if (players.length > 1) {
+            const activePlayer = players.filter(player => player.active)[0];
 
-        if (activePlayer) {
-            setCurrentPlayer(activePlayer.name);
+            if (activePlayer) {
+                setCurrentPlayer(activePlayer.name);
+            } else {
+                setCurrentPlayer(players[0].name);
+            }
         }
-    }, [players])
+    }, [players]);
+
+    // check boxes for a match
+    useEffect(() => {
+        if (secondBox.url) {
+            checkBoxes();
+        }
+        // eslint-disable-next-line
+    }, [secondBox]);
 
     return (
         <Container fluid className={'d-flex flex-column vh-100' + (gameLocked ? ' game-locked' : '')}>
             <Row>
                 <GameConfig
-                    onSquareCountChange={(grid) => setGridDimensions(JSON.parse(grid))}
+                    onBoxCountChange={(grid) => setGridDimensions(JSON.parse(grid))}
                     gameLocked={gameLocked}
                     gridDimensions={gridDimensions}
                     players={players}
+                    currentPlayer={currentPlayer}
                     addPlayer={handleAddPlayer}
                     removePlayer={handleRemovePlayer}
                     onStartButtonClick={handleStartButtonClick}
                     onEndButtonClick={handleEndButtonClick}/>
             </Row>
 
-            {squares.length > 0 &&
+            {boxes.length > 0 &&
                 <Row className='flex-fill'>
                     <GameBoard
-                        squares={squares}
+                        boxes={boxes}
                         gridDimensions={gridDimensions}
-                        onSquareClick={handleSquareClick}/>
+                        onBoxClick={handleBoxClick}/>
                 </Row>
             }
         </Container>
