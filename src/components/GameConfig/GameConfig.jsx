@@ -51,7 +51,7 @@ const GameConfig = props => {
 
     return (
         <>
-            <div className='d-flex align-items-center mt-3'>
+            <div className='d-flex align-items-start align-items-sm-center mt-3'>
                 {!props.gameLocked &&
                     <>
                         <div className='form-floating'>
@@ -77,28 +77,38 @@ const GameConfig = props => {
                 {props.gameLocked && props.currentPlayer &&
                     <div className='lead'>
                         {props.players.map(player => (
-                            <span
-                                className={'badge fw-normal me-2' + (
-                                    player.name === props.currentPlayer ?
-                                        ' bg-primary shadow shadow-dark'
-                                        : ' bg-secondary')}
-                                key={player.name}>
-                                {player.name} {player.score}</span>
+                            <span className={'badge fw-normal me-2 my-1' + (
+                                player.name === props.currentPlayer ?
+                                    ' bg-primary shadow shadow-dark'
+                                    : ' bg-secondary')}
+                                  key={player.name}>
+                                {player.name} <span className='lead fw-bold'>{player.score}</span>
+                            </span>
                         ))}
                     </div>
                 }
 
-                <div className='ms-auto'>
-                    <button className={'btn btn-success btn-xl' + (props.gameLocked ? ' d-none' : '')}
-                            onClick={props.onStartButtonClick}
-                            disabled={props.gridDimensions[0] === 0}>
-                        Start Game
-                    </button>
+                <div className='ms-auto d-flex align-items-center'>
+                    {!props.gameLocked &&
+                        <button className='btn btn-success btn-xl'
+                                onClick={props.onStartButtonClick}
+                                disabled={props.gridDimensions[0] === 0}>
+                            Start Game
+                        </button>
+                    }
 
-                    <ButtonWithConfirm variant="danger" value='End Game'
-                                       classes={(!props.gameLocked ? ' d-none' : '')}
-                                       modalBody={<>Are you sure you want to end the game?</>}
-                                       onYes={() => props.onEndButtonClick()}/>
+                    {props.gameLocked &&
+                        <>
+                            <div className='me-3 text-center'>
+                                <span className='lead fw-bold'>{props.guessCount}</span> Guesses
+                            </div>
+
+                            <ButtonWithConfirm variant="danger" value='End Game'
+                                               classes={(!props.gameLocked ? ' d-none' : '')}
+                                               modalBody={<>Are you sure you want to end the game?</>}
+                                               onYes={() => props.onEndButtonClick()}/>
+                        </>
+                    }
                 </div>
             </div>
 

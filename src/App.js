@@ -15,6 +15,7 @@ function App() {
     const [showPlayers, setShowPlayers] = useState(false);
     const [currentPlayer, setCurrentPlayer] = useState();
     const [gameComplete, setGameComplete] = useState(false);
+    const [guessCount, setGuessCount] = useState(0);
 
     const shuffle = array => {
         for (let i = array.length - 1; i > 0; i--) {
@@ -33,6 +34,9 @@ function App() {
             if (!shownBoxCount && !box.matched) {
                 setFirstBox(box);
                 setSecondBox({});
+
+                // increment guess count
+                setGuessCount(guessCount + 1);
             }
 
             // show clicked box on first two clicks
@@ -77,6 +81,7 @@ function App() {
         setGameComplete(false);
         setGameLocked(false);
         setShowPlayers(false);
+        setGuessCount(0);
 
         // reset grid to current dimensions to fetch new images
         const currentGridDimensions = gridDimensions;
@@ -258,18 +263,24 @@ function App() {
                     removePlayer={handleRemovePlayer}
                     onStartButtonClick={handleStartButtonClick}
                     onEndButtonClick={handleEndButtonClick}
-                    onSetShowPlayers={setShowPlayers}/>
+                    onSetShowPlayers={setShowPlayers}
+                    guessCount={guessCount}/>
             </Row>
 
-            {boxes.length > 0 &&
-                <Row className='flex-fill'>
+            <Row className='flex-fill align-items-center'>
+                {boxes.length > 0 ?
                     <GameBoard
                         boxes={boxes}
                         gridDimensions={gridDimensions}
                         onBoxClick={handleBoxClick}
                         gameComplete={gameComplete}/>
-                </Row>
-            }
+                    :
+                    <div className='text-center text-muted opacity-50'>
+                        <div className='display-1 fst-italic'>Memory Deluxe</div>
+                        <div className='mt-2'>A SeaBee Software production</div>
+                    </div>
+                }
+            </Row>
         </Container>
     );
 }
