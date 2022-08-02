@@ -16,6 +16,8 @@ function App() {
     const [currentPlayer, setCurrentPlayer] = useState();
     const [gameComplete, setGameComplete] = useState(false);
     const [guessCount, setGuessCount] = useState(0);
+    const [grayscale, setGrayscale] = useState(false);
+    const [blur, setBlur] = useState(false);
 
     const shuffle = array => {
         for (let i = array.length - 1; i > 0; i--) {
@@ -199,7 +201,15 @@ function App() {
 
             [...Array(count)].forEach((v, i) => {
                 const seed = Math.floor(Math.random() * 9999) + 1;
-                const imgUrl = 'https://picsum.photos/seed/' + seed + '/600/400';
+                let imgUrl = 'https://picsum.photos/seed/' + seed + '/600/400';
+
+                if (grayscale && blur) {
+                    imgUrl += '?grayscale&blur=10';
+                } else if (grayscale) {
+                    imgUrl += '?grayscale';
+                } else if (blur) {
+                    imgUrl += '?blur=10';
+                }
 
                 // add each image twice
                 newBoxes.push({
@@ -223,7 +233,7 @@ function App() {
         if (Array.isArray(gridDimensions)) {
             getBoxes((gridDimensions[0] * gridDimensions[1] / 2));
         }
-    }, [gridDimensions]);
+    }, [blur, grayscale, gridDimensions]);
 
     // set active player
     useEffect(() => {
@@ -272,7 +282,11 @@ function App() {
                     onStartButtonClick={handleStartButtonClick}
                     onEndButtonClick={handleEndButtonClick}
                     onSetShowPlayers={setShowPlayers}
-                    guessCount={guessCount}/>
+                    guessCount={guessCount}
+                    grayscale={grayscale}
+                    onSetGrayscale={val => setGrayscale(val)}
+                    blur={blur}
+                    onSetBlur={val => setBlur(val)}/>
             </Row>
 
             <Row className='flex-fill'>
