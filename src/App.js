@@ -75,6 +75,18 @@ function App() {
 
     const handleStartButtonClick = () => {
         setGameLocked(true);
+
+        // set the first player as active
+        setPlayers(current => current.map(obj => {
+            obj.active = false;
+            const matchingPlayerIndex = players.findIndex(player => player.name === obj.name);
+
+            if (matchingPlayerIndex === 0) {
+                obj.active = true;
+            }
+
+            return obj;
+        }));
     }
 
     const handleEndButtonClick = () => {
@@ -114,18 +126,14 @@ function App() {
 
     const advanceCurrentPlayer = () => {
         // the index of the current player among all players
-        const currentPlayerIndex = players.findIndex(player => {
-            return player.active === true;
-        });
+        const currentPlayerIndex = players.findIndex(player => player.active === true);
 
         setPlayers(current => current.map(obj => {
             // deactivate each player
             obj.active = false;
 
             // the index of the player who matches the currently looping player
-            const matchingPlayerIndex = players.findIndex(player => {
-                return player.name === obj.name;
-            });
+            const matchingPlayerIndex = players.findIndex(player => player.name === obj.name);
 
             // the looping player is not the last player in the array
             if (currentPlayerIndex < players.length - 1) {
