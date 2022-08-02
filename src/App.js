@@ -234,8 +234,6 @@ function App() {
                 setCurrentPlayer(activePlayer.name);
             } else {
                 setCurrentPlayer(players[0].name);
-
-
             }
         }
     }, [players]);
