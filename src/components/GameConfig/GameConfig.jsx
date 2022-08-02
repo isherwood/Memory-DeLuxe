@@ -1,6 +1,7 @@
 import React, {useEffect, useRef, useState} from "react";
 import {Button, Col, Form, Row} from 'react-bootstrap';
 import ButtonWithConfirm from "../ButtonWithConfirm/ButtonWithConfirm";
+import {FaPlay, FaStop, FaUserMinus, FaUserPlus, FaUsers} from "react-icons/fa";
 
 const GameConfig = props => {
     const [name, setName] = useState('');
@@ -51,14 +52,15 @@ const GameConfig = props => {
 
     return (
         <>
-            <div className='d-flex align-items-start align-items-sm-center mt-3'>
+            <div className='d-flex align-items-center mt-3'>
                 {!props.gameLocked &&
                     <>
                         <div className='form-floating'>
                             <Form.Select id="boxCount" className="w-auto"
                                          onChange={handleCountChange}
                                          disabled={props.gameLocked}>
-                                <option value='[0,0]'>Select a box count</option>
+                                <option value='[0,0]'>Select count</option>
+
                                 {gridOptions.map((option, i) => (
                                     <option key={i}
                                             value={'[' + option[0] + ',' + option[1] + ']'}>
@@ -69,8 +71,23 @@ const GameConfig = props => {
                             <Form.Label htmlFor="boxCount">Box Count</Form.Label>
                         </div>
 
-                        <Button variant='primary' className='btn-xl ms-2'
-                                onClick={handleShowPlayers}>Players (optional)</Button>
+                        <Button variant='primary' className='btn-xl ms-2 ms-sm-3'
+                                onClick={handleShowPlayers}>
+                            <FaUsers className='lead'/>
+                            <span className='d-none d-md-inline ms-2'>Players (optional)</span>
+                        </Button>
+
+                        <div className='ms-2 ms-sm-3'>
+                            <Form.Group>
+                                <Form.Check type="checkbox" label="Gray" defaultChecked={props.grayscale}
+                                            onClick={e => props.onSetGrayscale(e.currentTarget.checked)}></Form.Check>
+                            </Form.Group>
+
+                            <Form.Group>
+                                <Form.Check type="checkbox" label="Blur" defaultChecked={props.blur}
+                                            onClick={e => props.onSetBlur(e.currentTarget.checked)}></Form.Check>
+                            </Form.Group>
+                        </div>
                     </>
                 }
 
@@ -88,12 +105,13 @@ const GameConfig = props => {
                     </div>
                 }
 
-                <div className='ms-auto d-flex align-items-center'>
+                <div className='ms-auto d-flex align-self-start align-self-md-center align-items-center'>
                     {!props.gameLocked &&
-                        <button className='btn btn-success btn-xl'
+                        <button className='btn btn-success btn-xl ms-3'
                                 onClick={props.onStartButtonClick}
                                 disabled={props.gridDimensions[0] === 0}>
-                            Start Game
+                            <FaPlay className='lead'/>
+                            <span className='d-none d-md-inline ms-2'>Start Game</span>
                         </button>
                     }
 
@@ -103,7 +121,10 @@ const GameConfig = props => {
                                 <span className='lead fw-bold'>{props.guessCount}</span> Guesses
                             </div>
 
-                            <ButtonWithConfirm variant="danger" value='End Game'
+                            <ButtonWithConfirm variant="danger" value={<>
+                                <FaStop className='lead'/>
+                                <span className='d-none d-md-inline ms-2'>End Game</span>
+                            </>}
                                                classes={'btn-xl' + (!props.gameLocked ? ' d-none' : '')}
                                                modalBody={<>Are you sure you want to end the game?</>}
                                                onYes={() => props.onEndButtonClick()}/>
@@ -117,16 +138,16 @@ const GameConfig = props => {
                     <p>Optionally add two or more players to track game order and score. Names must be unique.</p>
 
                     <Row>
-                        <Col>
+                        <Col xs={9} sm={6}>
                             <Form.Control type='text' placeholder='Enter player name' value={name}
                                           onChange={event => setName(event.target.value)}
                                           onKeyUp={handleNameInputKeyup}
                                           ref={nameInputRef}/>
                         </Col>
 
-                        <Col>
+                        <Col xs={3} sm={6} className='text-end text-sm-start'>
                             <Button variant='secondary'
-                                    onClick={handleAddPlayer}><b>+</b></Button>
+                                    onClick={handleAddPlayer}><FaUserPlus className='lead'/></Button>
                         </Col>
                     </Row>
 
@@ -135,11 +156,13 @@ const GameConfig = props => {
                     }
 
                     {props.players.map(player => (
-                        <Row className='mt-2 px-2' key={player.name}>
-                            <Col>{player.name}</Col>
+                        <Row className='mt-2' key={player.name}>
+                            <Col xs={9} sm={6}>{player.name}</Col>
 
-                            <Col><Button variant='secondary'
-                                         onClick={() => props.removePlayer(player.name)}><b>&ndash;</b></Button>
+                            <Col xs={3} sm={6} className='text-end text-sm-start'>
+                                <Button variant='secondary' onClick={() => props.removePlayer(player.name)}>
+                                    <FaUserMinus className='lead'/>
+                                </Button>
                             </Col>
                         </Row>
                     ))}

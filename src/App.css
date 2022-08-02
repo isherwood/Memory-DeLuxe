@@ -1,7 +1,5 @@
-@media (min-width: 500px) {
-    .btn.btn-xl {
-        padding: 1rem;
-    }
+.btn.btn-xl {
+    padding: 1rem;
 }
 
 .shadow.shadow-dark {
