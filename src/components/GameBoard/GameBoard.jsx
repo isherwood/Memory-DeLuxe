@@ -1,27 +1,27 @@
 import React from "react";
 
 import './styles.css';
-import GameBox from "../GameBox/GameBox";
+import GameTile from "../GameTile/GameTile";
 
 const GameBoard = props => {
     const colCount = props.gridDimensions[0];
     const rowCount = props.gridDimensions[1];
 
-    const handleBoxClick = (event, box) => {
-        props.onBoxClick(event, box);
+    const handleTileClick = (event, tile) => {
+        props.onTileClick(event, tile);
     }
 
     return (
         <>
-            {props.boxes.length === colCount * rowCount &&
+            {props.tiles.length === colCount * rowCount &&
                 <div id='gameBoard' className={'my-3 d-flex flex-column align-items-stretch' +
                     (props.gameComplete ? ' game-ended' : '')}>
                     {[...Array(rowCount)].map((v, i) => (
-                        <div className='d-flex flex-fill' key={props.boxes[i].url + i}>
+                        <div className='d-flex flex-fill' key={props.tiles[i].url + i}>
                             {[...Array(colCount)].map((v, j) => (
-                                <GameBox box={props.boxes[i * colCount + j]}
-                                         key={i * colCount + j}
-                                         onBoxClick={handleBoxClick}/>
+                                <GameTile tile={props.tiles[i * colCount + j]}
+                                          key={i * colCount + j}
+                                          onTileClick={handleTileClick}/>
                             ))}
                         </div>
                     ))}

@@ -8,7 +8,7 @@ const GameConfig = props => {
     const nameInputRef = useRef(null);
 
     const handleCountChange = e => {
-        props.onBoxCountChange(e.currentTarget.value);
+        props.onTileCountChange(e.currentTarget.value);
     }
 
     const gridOptions = [
@@ -56,7 +56,7 @@ const GameConfig = props => {
                 {!props.gameLocked &&
                     <>
                         <div className='form-floating'>
-                            <Form.Select id="boxCount" className="w-auto"
+                            <Form.Select id="tileCount" className="w-auto"
                                          onChange={handleCountChange}
                                          disabled={props.gameLocked}>
                                 <option value='[0,0]'>Select count</option>
@@ -68,7 +68,7 @@ const GameConfig = props => {
                                     </option>
                                 ))}
                             </Form.Select>
-                            <Form.Label htmlFor="boxCount">Box Count</Form.Label>
+                            <Form.Label htmlFor="tileCount">Tile Count</Form.Label>
                         </div>
 
                         <Button variant='primary' className='btn-xl ms-2 ms-sm-3'

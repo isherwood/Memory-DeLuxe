@@ -6,9 +6,9 @@ import GameBoard from "./components/GameBoard/GameBoard";
 import GameConfig from "./components/GameConfig/GameConfig";
 
 function App() {
-    const [boxes, setBoxes] = useState([]);
-    const [firstBox, setFirstBox] = useState({});
-    const [secondBox, setSecondBox] = useState({});
+    const [tiles, setTiles] = useState([]);
+    const [firstTile, setFirstTile] = useState({});
+    const [secondTile, setSecondTile] = useState({});
     const [gridDimensions, setGridDimensions] = useState([0, 0]);
     const [gameLocked, setGameLocked] = useState(false);
     const [players, setPlayers] = useState([]);
@@ -28,23 +28,23 @@ function App() {
         return array;
     }
 
-    const handleBoxClick = (event, box) => {
+    const handleTileClick = (event, tile) => {
         if (gameLocked) {
-            const shownBoxCount = boxes.filter(box => box.shown === true).length;
+            const shownTileCount = tiles.filter(tile => tile.shown === true).length;
 
-            // set first box on first click & clear second box
-            if (!shownBoxCount && !box.matched) {
-                setFirstBox(box);
-                setSecondBox({});
+            // set first tile on first click & clear second tile
+            if (!shownTileCount && !tile.matched) {
+                setFirstTile(tile);
+                setSecondTile({});
 
                 // increment guess count
                 setGuessCount(guessCount + 1);
             }
 
-            // show clicked box on first two clicks
-            if (shownBoxCount < 2 && !box.matched) {
-                setBoxes(current => current.map(obj => {
-                    if (obj.id === box.id) {
+            // show clicked tile on first two clicks
+            if (shownTileCount < 2 && !tile.matched) {
+                setTiles(current => current.map(obj => {
+                    if (obj.id === tile.id) {
                         return {...obj, shown: true}
                     }
 
@@ -52,25 +52,25 @@ function App() {
                 }));
             }
 
-            // set second box on second click if it's not the first box
-            if (shownBoxCount === 1 && box.id !== firstBox.id && !box.matched) {
-                setSecondBox(box);
+            // set second tile on second click if it's not the first tile
+            if (shownTileCount === 1 && tile.id !== firstTile.id && !tile.matched) {
+                setSecondTile(tile);
             }
 
-            // clear shown and set boxes on third click
-            if (shownBoxCount === 2) {
+            // clear shown and set tiles on third click
+            if (shownTileCount === 2) {
 
                 // advance current player if not a match
-                if (currentPlayer && firstBox['url'] !== secondBox['url']) {
+                if (currentPlayer && firstTile['url'] !== secondTile['url']) {
                     advanceCurrentPlayer();
                 }
 
-                setBoxes(current => current.map(obj => {
+                setTiles(current => current.map(obj => {
                     return {...obj, shown: false}
                 }));
 
-                setFirstBox({});
-                setSecondBox({});
+                setFirstTile({});
+                setSecondTile({});
             }
         }
     }
@@ -154,31 +154,31 @@ function App() {
         }));
     }
 
-    const checkBoxes = () => {
+    const checkTiles = () => {
 
         // check for a match
-        if (firstBox['url'] === secondBox['url']) {
+        if (firstTile['url'] === secondTile['url']) {
 
-            // set the first box matched property to true
-            setBoxes(current => current.map(obj => {
-                if (obj.id === firstBox['id'] || obj.id === secondBox['id']) {
+            // set the first tile matched property to true
+            setTiles(current => current.map(obj => {
+                if (obj.id === firstTile['id'] || obj.id === secondTile['id']) {
                     return {...obj, matched: true}
                 }
 
                 return obj;
             }));
 
-            // repeat to set the second box matched property to true
-            setBoxes(current => current.map(obj => {
-                if (obj.id === firstBox['id'] || obj.id === secondBox['id']) {
+            // repeat to set the second tile matched property to true
+            setTiles(current => current.map(obj => {
+                if (obj.id === firstTile['id'] || obj.id === secondTile['id']) {
                     return {...obj, matched: true}
                 }
 
                 return obj;
             }));
 
-            // set the shown property of all boxes to false
-            setBoxes(current => current.map(obj => {
+            // set the shown property of all tiles to false
+            setTiles(current => current.map(obj => {
                 return {...obj, shown: false}
             }));
 
@@ -193,11 +193,11 @@ function App() {
         }
     }
 
-    // initialize boxes
+    // initialize tiles
     useEffect(() => {
-        const getBoxes = count => {
-            setBoxes([]);
-            let newBoxes = [];
+        const getTiles = count => {
+            setTiles([]);
+            let newTiles = [];
 
             [...Array(count)].forEach((v, i) => {
                 const seed = Math.floor(Math.random() * 9999) + 1;
@@ -212,13 +212,13 @@ function App() {
                 }
 
                 // add each image twice
-                newBoxes.push({
+                newTiles.push({
                     id: i + 'a',
                     url: imgUrl,
                     shown: false,
                     matched: false
                 });
-                newBoxes.push({
+                newTiles.push({
                     id: i + 'b',
                     url: imgUrl,
                     shown: false,
@@ -226,12 +226,12 @@ function App() {
                 });
             });
 
-            newBoxes = shuffle(newBoxes);
-            setBoxes(newBoxes);
+            newTiles = shuffle(newTiles);
+            setTiles(newTiles);
         }
 
         if (Array.isArray(gridDimensions)) {
-            getBoxes((gridDimensions[0] * gridDimensions[1] / 2));
+            getTiles((gridDimensions[0] * gridDimensions[1] / 2));
         }
     }, [blur, grayscale, gridDimensions]);
 
@@ -248,30 +248,30 @@ function App() {
         }
     }, [players]);
 
-    // check boxes for a match
+    // check tiles for a match
     useEffect(() => {
-        if (secondBox.url) {
-            checkBoxes();
+        if (secondTile.url) {
+            checkTiles();
         }
         // eslint-disable-next-line
-    }, [secondBox]);
+    }, [secondTile]);
 
     // check for game completion
     useEffect(() => {
-        if (boxes.length) {
-            const unmatchedBoxes = boxes.filter(box => !box.matched);
+        if (tiles.length) {
+            const unmatchedTiles = tiles.filter(tile => !tile.matched);
 
-            if (!unmatchedBoxes.length) {
+            if (!unmatchedTiles.length) {
                 setGameComplete(true);
             }
         }
-    }, [boxes]);
+    }, [tiles]);
 
     return (
         <Container fluid className={'d-flex flex-column vh-100' + (gameLocked ? ' game-locked' : '')}>
             <Row>
                 <GameConfig
-                    onBoxCountChange={(grid) => setGridDimensions(JSON.parse(grid))}
+                    onTileCountChange={(grid) => setGridDimensions(JSON.parse(grid))}
                     gameLocked={gameLocked}
                     gridDimensions={gridDimensions}
                     players={players}
@@ -290,11 +290,11 @@ function App() {
             </Row>
 
             <Row className='flex-fill'>
-                {boxes.length > 0 && !showPlayers ?
+                {tiles.length > 0 && !showPlayers ?
                     <GameBoard
-                        boxes={boxes}
+                        tiles={tiles}
                         gridDimensions={gridDimensions}
-                        onBoxClick={handleBoxClick}
+                        onTileClick={handleTileClick}
                         gameComplete={gameComplete}/>
                     :
                     <div className='align-self-center mb-4 text-center text-muted opacity-50'>

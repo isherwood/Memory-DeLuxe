@@ -1,17 +1,17 @@
-.box-outer {
+.tile-outer {
     flex: 1;
     margin: .25rem;
     position: relative;
 }
 
-.box-inner {
+.tile-inner {
     background-size: cover;
     background-position: center;
     counter-increment: line-number;
     cursor: not-allowed;
 }
 
-.box-inner::before {
+.tile-inner::before {
     content: counter(line-number);
     position: absolute;
     left: 0;
@@ -28,24 +28,24 @@
 }
 
 @media (min-width: 600px) and (min-height: 500px) {
-    .box-inner::before {
+    .tile-inner::before {
         font-size: 3rem;
     }
 }
 
-.game-locked .box-inner {
+.game-locked .tile-inner {
     cursor: pointer;
 }
 
-.game-locked .box-inner:hover:not(.matched)::before {
+.game-locked .tile-inner:hover:not(.matched)::before {
     color: #000;
 }
 
-.box-inner.shown::before {
+.tile-inner.shown::before {
     opacity: 0;
 }
 
-.box-inner.matched::before {
+.tile-inner.matched::before {
     opacity: 0;
     animation: opacityInOutIn;
     animation-duration: .5s;
@@ -54,7 +54,7 @@
     cursor: not-allowed;
 }
 
-.game-ended .box-inner::before {
+.game-ended .tile-inner::before {
     animation: opacityInOutIn .5s ease .5s, opacityIn 3s ease 2s;
     animation-fill-mode: forwards;
     cursor: default;
