@@ -1,7 +1,9 @@
 import React, {useEffect, useRef, useState} from "react";
 import {Button, Col, Form, Row} from 'react-bootstrap';
 import ButtonWithConfirm from "../ButtonWithConfirm/ButtonWithConfirm";
-import {FaPlay, FaStop, FaUserMinus, FaUserPlus, FaUsers} from "react-icons/fa";
+import {FaMoon, FaPlay, FaStop, FaUserMinus, FaUserPlus, FaUsers} from "react-icons/fa";
+import {IoMdColorPalette} from "react-icons/io";
+import {MdBlurOn} from "react-icons/md";
 
 const GameConfig = props => {
     const [name, setName] = useState('');
@@ -12,18 +14,23 @@ const GameConfig = props => {
     }
 
     const gridOptions = [
-        [3, 2],
+        [2, 3], [3, 2],
+        [2, 4], [4, 2],
+        [2, 5], [5, 2],
         [2, 6], [3, 4], [4, 3],
         [4, 4],
         [3, 6], [6, 3],
         [4, 5], [5, 4],
         [3, 8], [4, 6], [6, 4], [8, 3],
+        [4, 7], [7, 4],
         [3, 10], [5, 6], [6, 5], [10, 3],
         [4, 9], [6, 6], [9, 4],
         [4, 10], [5, 8], [8, 5], [10, 4],
         [6, 7], [7, 6],
         [7, 8], [8, 7],
-        [8, 8]
+        [6, 10], [10, 6],
+        [8, 8],
+        [10, 10]
     ]
 
     const handleShowPlayers = () => {
@@ -71,21 +78,29 @@ const GameConfig = props => {
                             <Form.Label htmlFor="tileCount">Tile Count</Form.Label>
                         </div>
 
-                        <Button variant='primary' className='btn-xl ms-2 ms-sm-3'
+                        <Button variant='primary' className='btn-xl ms-1 ms-sm-2 ms-md-3'
                                 onClick={handleShowPlayers}>
                             <FaUsers className='lead'/>
                             <span className='d-none d-md-inline ms-2'>Players (optional)</span>
                         </Button>
 
-                        <div className='ms-2 ms-sm-3'>
+                        <div className='ms-1 ms-sm-2 ms-md-3'>
                             <Form.Group>
-                                <Form.Check type="checkbox" id='grayscaleCheckbox' label="Gray"
+                                <Form.Check type="checkbox" id='grayscaleCheckbox'
+                                            label={<>
+                                                <span className='d-none d-md-inline'>Gray</span>
+                                                <IoMdColorPalette className='d-md-none'/>
+                                            </>}
                                             defaultChecked={props.grayscale}
                                             onClick={e => props.onSetGrayscale(e.currentTarget.checked)}></Form.Check>
                             </Form.Group>
 
                             <Form.Group>
-                                <Form.Check type="checkbox" id='blurCheckbox' label="Blur"
+                                <Form.Check type="checkbox" id='blurCheckbox'
+                                            label={<>
+                                                <span className='d-none d-md-inline'>Blur</span>
+                                                <MdBlurOn className='d-md-none'/>
+                                            </>}
                                             defaultChecked={props.blur}
                                             onClick={e => props.onSetBlur(e.currentTarget.checked)}></Form.Check>
                             </Form.Group>
@@ -109,7 +124,7 @@ const GameConfig = props => {
 
                 <div className='ms-auto d-flex align-self-start align-self-md-center align-items-center'>
                     {!props.gameLocked &&
-                        <button className='btn btn-success btn-xl ms-3'
+                        <button className='btn btn-success btn-xl ms-1 ms-sm-2 ms-md-3'
                                 onClick={props.onStartButtonClick}
                                 disabled={props.gridDimensions[0] === 0}>
                             <FaPlay className='lead'/>
@@ -123,15 +138,22 @@ const GameConfig = props => {
                                 <span className='lead fw-bold'>{props.guessCount}</span> Guesses
                             </div>
 
-                            <ButtonWithConfirm variant="danger" value={<>
-                                <FaStop className='lead'/>
-                                <span className='d-none d-md-inline ms-2'>End Game</span>
-                            </>}
+                            <ButtonWithConfirm variant="danger"
+                                               value={<>
+                                                   <FaStop className='lead'/>
+                                                   <span className='d-none d-md-inline ms-1 ms-sm-2 ms-md-3'>End Game</span>
+                                               </>}
                                                classes={'btn-xl' + (!props.gameLocked ? ' d-none' : '')}
                                                modalBody={<>Are you sure you want to end the game?</>}
                                                onYes={() => props.onEndButtonClick()}/>
                         </>
                     }
+
+                    <button className='btn btn-dark btn-xl ms-1 ms-sm-2 ms-md-3'
+                            onClick={props.onDarkModeButtonClick}>
+                        <FaMoon className='lead'/>
+                        <span className='d-none d-md-inline ms-2'>Dark Mode</span>
+                    </button>
                 </div>
             </div>
 
