@@ -8,7 +8,7 @@ const GameConfig = props => {
     const nameInputRef = useRef(null);
 
     const handleCountChange = e => {
-        props.onBoxCountChange(e.currentTarget.value);
+        props.onTileCountChange(e.currentTarget.value);
     }
 
     const gridOptions = [
@@ -56,7 +56,7 @@ const GameConfig = props => {
                 {!props.gameLocked &&
                     <>
                         <div className='form-floating'>
-                            <Form.Select id="boxCount" className="w-auto"
+                            <Form.Select id="tileCount" className="w-auto"
                                          onChange={handleCountChange}
                                          disabled={props.gameLocked}>
                                 <option value='[0,0]'>Select count</option>
@@ -68,7 +68,7 @@ const GameConfig = props => {
                                     </option>
                                 ))}
                             </Form.Select>
-                            <Form.Label htmlFor="boxCount">Box Count</Form.Label>
+                            <Form.Label htmlFor="tileCount">Tile Count</Form.Label>
                         </div>
 
                         <Button variant='primary' className='btn-xl ms-2 ms-sm-3'
@@ -79,12 +79,14 @@ const GameConfig = props => {
 
                         <div className='ms-2 ms-sm-3'>
                             <Form.Group>
-                                <Form.Check type="checkbox" label="Gray" defaultChecked={props.grayscale}
+                                <Form.Check type="checkbox" id='grayscaleCheckbox' label="Gray"
+                                            defaultChecked={props.grayscale}
                                             onClick={e => props.onSetGrayscale(e.currentTarget.checked)}></Form.Check>
                             </Form.Group>
 
                             <Form.Group>
-                                <Form.Check type="checkbox" label="Blur" defaultChecked={props.blur}
+                                <Form.Check type="checkbox" id='blurCheckbox' label="Blur"
+                                            defaultChecked={props.blur}
                                             onClick={e => props.onSetBlur(e.currentTarget.checked)}></Form.Check>
                             </Form.Group>
                         </div>
