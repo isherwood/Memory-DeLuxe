@@ -79,12 +79,14 @@ const GameConfig = props => {
 
                         <div className='ms-2 ms-sm-3'>
                             <Form.Group>
-                                <Form.Check type="checkbox" label="Gray" defaultChecked={props.grayscale}
+                                <Form.Check type="checkbox" id='grayscaleCheckbox' label="Gray"
+                                            defaultChecked={props.grayscale}
                                             onClick={e => props.onSetGrayscale(e.currentTarget.checked)}></Form.Check>
                             </Form.Group>
 
                             <Form.Group>
-                                <Form.Check type="checkbox" label="Blur" defaultChecked={props.blur}
+                                <Form.Check type="checkbox" id='blurCheckbox' label="Blur"
+                                            defaultChecked={props.blur}
                                             onClick={e => props.onSetBlur(e.currentTarget.checked)}></Form.Check>
                             </Form.Group>
                         </div>
