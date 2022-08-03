@@ -4,6 +4,23 @@
     position: relative;
 }
 
+.tile-outer:before {
+    content: " ";
+    display: block;
+    width: 46px;
+    height: 46px;
+    position: absolute;
+    top: calc(50% - 23px);
+    left: calc(50% - 23px);
+    margin: 1px;
+    border-radius: 50%;
+    border: 5px solid #ccc;
+    border-right-color: transparent;
+    border-left-color: transparent;
+    animation: rotate 1.2s linear infinite;
+    z-index: -1;
+}
+
 .tile-inner {
     background-size: cover;
     background-position: center;
@@ -58,6 +75,15 @@
     animation: opacityInOutIn .5s ease .5s, opacityIn 3s ease 2s;
     animation-fill-mode: forwards;
     cursor: default;
+}
+
+@keyframes rotate {
+    0% {
+        transform: rotate(0deg);
+    }
+    100% {
+        transform: rotate(360deg);
+    }
 }
 
 @keyframes opacityInOutIn {
