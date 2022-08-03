@@ -2,16 +2,17 @@
     flex: 1;
     margin: .25rem;
     position: relative;
+    overflow: hidden;
 }
 
 .tile-outer:before {
     content: " ";
     display: block;
-    width: 46px;
-    height: 46px;
+    width: 24px;
+    height: 24px;
     position: absolute;
-    top: calc(50% - 23px);
-    left: calc(50% - 23px);
+    top: calc(50% - 12px);
+    left: calc(50% - 12px);
     margin: 1px;
     border-radius: 50%;
     border: 5px solid #ccc;
@@ -44,7 +45,14 @@
     transition: all .3s;
 }
 
-@media (min-width: 600px) and (min-height: 500px) {
+@media (min-width: 800px) and (min-height: 600px) {
+    .tile-outer:before {
+        width: 48px;
+        height: 48px;
+        top: calc(50% - 24px);
+        left: calc(50% - 24px);
+    }
+
     .tile-inner::before {
         font-size: 3rem;
     }
