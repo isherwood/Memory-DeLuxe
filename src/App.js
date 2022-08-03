@@ -77,6 +77,7 @@ function App() {
 
     const handleStartButtonClick = () => {
         setGameLocked(true);
+        setShowPlayers(false);
 
         // set the first player as active
         setPlayers(current => current.map(obj => {
@@ -94,7 +95,6 @@ function App() {
     const handleEndButtonClick = () => {
         setGameComplete(false);
         setGameLocked(false);
-        setShowPlayers(false);
         setGuessCount(0);
 
         // reset grid to current dimensions to fetch new images
@@ -290,7 +290,7 @@ function App() {
             </Row>
 
             <Row className='flex-fill'>
-                {boxes.length > 0 ?
+                {boxes.length > 0 && !showPlayers ?
                     <GameBoard
                         boxes={boxes}
                         gridDimensions={gridDimensions}
