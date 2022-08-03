@@ -1,12 +1,12 @@
 import {shallow} from 'enzyme';
-import GameBox from './GameBox';
+import GameTile from './GameTile';
 
 describe('GameBoard component', () => {
     let component;
 
     beforeEach(() => {
         // build the component
-        component = shallow(<GameBox/>);
+        component = shallow(<GameTile/>);
     });
 
     afterEach(() => {
