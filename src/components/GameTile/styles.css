@@ -25,12 +25,12 @@
 .tile-inner {
     background-size: cover;
     background-position: center;
-    counter-increment: line-number;
+    counter-increment: tile-count;
     cursor: not-allowed;
 }
 
 .tile-inner::before {
-    content: counter(line-number);
+    content: counter(tile-count);
     position: absolute;
     left: 0;
     top: 0;
@@ -43,6 +43,10 @@
     color: #777;
     font-size: 1.5rem;
     transition: all .3s;
+}
+
+.grayscale-mode .tile-inner::before {
+    background: #ccaaaa;
 }
 
 @media (min-width: 800px) and (min-height: 600px) {
