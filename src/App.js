@@ -268,7 +268,9 @@ function App() {
     }, [tiles]);
 
     return (
-        <Container fluid className={'d-flex flex-column vh-100' + (gameLocked ? ' game-locked' : '')}>
+        <Container fluid className={'d-flex flex-column vh-100'
+            + (gameLocked ? ' game-locked' : '')
+            + (grayscale ? ' grayscale-mode' : '')}>
             <Row>
                 <GameConfig
                     onTileCountChange={(grid) => setGridDimensions(JSON.parse(grid))}
