@@ -13,6 +13,7 @@ function App() {
     const [gameLocked, setGameLocked] = useState(false);
     const [players, setPlayers] = useState([]);
     const [showPlayers, setShowPlayers] = useState(false);
+    const [randomizePlayers, setRandomizePlayers] = useState(false);
     const [currentPlayer, setCurrentPlayer] = useState();
     const [gameComplete, setGameComplete] = useState(false);
     const [guessCount, setGuessCount] = useState(0);
@@ -78,6 +79,11 @@ function App() {
     const handleStartButtonClick = () => {
         setGameLocked(true);
         setShowPlayers(false);
+
+        // randomize players if necessary
+        if (randomizePlayers) {
+            setPlayers(shuffle(players));
+        }
 
         // set the first player as active
         setPlayers(current => current.map(obj => {
@@ -281,6 +287,8 @@ function App() {
                     currentPlayer={currentPlayer}
                     addPlayer={handleAddPlayer}
                     removePlayer={handleRemovePlayer}
+                    randomizePlayers={randomizePlayers}
+                    onSetRandomizePlayers={val => setRandomizePlayers(val)}
                     onStartButtonClick={handleStartButtonClick}
                     onEndButtonClick={handleEndButtonClick}
                     onSetShowPlayers={setShowPlayers}
