@@ -144,6 +144,12 @@ const GameConfig = props => {
                 <div className='mt-3'>
                     <p>Optionally add two or more players to track game order and score. Names must be unique.</p>
 
+                    <Form.Group className='mb-3'>
+                        <Form.Check type="checkbox" id='randomizePlayersCheckbox' label="Randomize players"
+                                    defaultChecked={props.randomizePlayers}
+                                    onClick={e => props.onSetRandomizePlayers(e.currentTarget.checked)}></Form.Check>
+                    </Form.Group>
+
                     <Row>
                         <Col xs={9} sm={6}>
                             <Form.Control type='text' placeholder='Enter player name' value={name}
