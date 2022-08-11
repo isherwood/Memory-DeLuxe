@@ -206,7 +206,7 @@ function App() {
             let newTiles = [];
 
             [...Array(count)].forEach((v, i) => {
-                const seed = Math.floor(Math.random() * 9999) + 1;
+                const seed = Math.floor(Math.random() * 99999) + 1;
                 let imgUrl = 'https://picsum.photos/seed/' + seed + '/600/400';
 
                 if (grayscale && blur) {
