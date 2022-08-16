@@ -7,6 +7,7 @@ import GameConfig from "./components/GameConfig/GameConfig";
 
 function App() {
     const [tiles, setTiles] = useState([]);
+    const [showTiles, setShowTiles] = useState(false);
     const [firstTile, setFirstTile] = useState({});
     const [secondTile, setSecondTile] = useState({});
     const [gridDimensions, setGridDimensions] = useState([0, 0]);
@@ -27,6 +28,16 @@ function App() {
         }
 
         return array;
+    }
+
+    const handleSetShowTiles = () => {
+        setShowTiles(!showTiles);
+        if (!showTiles) setShowPlayers(false);
+    }
+
+    const handleSetShowPlayers = () => {
+        setShowPlayers(!showPlayers);
+        if (!showPlayers) setShowTiles(false);
     }
 
     const handleTileClick = (event, tile) => {
@@ -283,7 +294,10 @@ function App() {
                     gameLocked={gameLocked}
                     gridDimensions={gridDimensions}
                     players={players}
+                    showTiles={showTiles}
+                    onSetShowTiles={handleSetShowTiles}
                     showPlayers={showPlayers}
+                    onSetShowPlayers={handleSetShowPlayers}
                     currentPlayer={currentPlayer}
                     addPlayer={handleAddPlayer}
                     removePlayer={handleRemovePlayer}
@@ -291,7 +305,6 @@ function App() {
                     onSetRandomizePlayers={val => setRandomizePlayers(val)}
                     onStartButtonClick={handleStartButtonClick}
                     onEndButtonClick={handleEndButtonClick}
-                    onSetShowPlayers={setShowPlayers}
                     guessCount={guessCount}
                     grayscale={grayscale}
                     onSetGrayscale={val => setGrayscale(val)}
