@@ -331,7 +331,7 @@ function App() {
             </Row>
 
             <Row className='flex-fill'>
-                {tiles.length > 0 && !showPlayers ?
+                {tiles.length > 0 && !showPlayers && !useCustomImages ?
                     <GameBoard
                         tiles={tiles}
                         gridDimensions={gridDimensions}
