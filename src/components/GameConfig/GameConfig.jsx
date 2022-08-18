@@ -3,17 +3,13 @@ import {Button, Col, Form, Row} from 'react-bootstrap';
 import ButtonWithConfirm from "../ButtonWithConfirm/ButtonWithConfirm";
 import {FaPlay, FaStop, FaUserMinus, FaUserPlus, FaUsers} from "react-icons/fa";
 import {IoGridSharp} from "react-icons/io5";
-import {BiImageAdd} from "react-icons/bi";
-import {MdDelete} from "react-icons/md";
 
 const GameConfig = props => {
     const [name, setName] = useState('');
     const nameInputRef = useRef(null);
-    const [image, setImage] = useState('');
-    const imageInputRef = useRef(null);
 
-    const getTileCount = () => {
-        return props.gridDimensions[0] * props.gridDimensions[1];
+    const handleCountChange = e => {
+        props.onTileCountChange(e.currentTarget.value);
     }
 
     const gridOptions = [
@@ -36,40 +32,8 @@ const GameConfig = props => {
         [10, 10]
     ]
 
-    const isValidUrl = str => {
-        let url;
-
-        try {
-            url = new URL(str);
-        } catch (_) {
-            return false;
-        }
-
-        return url.protocol === "https:";
-    }
-
-    const handleCountChange = e => {
-        props.onTileCountChange(e.currentTarget.value);
-    }
-
     const handleShowTiles = () => {
         props.onSetShowTiles(!props.showTiles);
-    }
-
-    const handleAddImage = () => {
-        const imageValid = image && isValidUrl(image);
-
-        if (imageValid && !props.customImages.filter(image => image.url === image).length) {
-            props.addCustomImage(image);
-            setImage('');
-            imageInputRef.current.focus();
-        }
-    }
-
-    const handleImageInputKeyup = event => {
-        if (event.key === 'Enter') {
-            handleAddImage();
-        }
     }
 
     const handleShowPlayers = () => {
@@ -90,14 +54,6 @@ const GameConfig = props => {
         }
     }
 
-    // focus the image input when tile config is shown
-    useEffect(() => {
-        if (props.showTiles && props.useCustomImages && props.tileCount) {
-            imageInputRef.current.focus();
-        }
-    }, [props.showTiles, props.tileCount, props.useCustomImages]);
-
-    // focus the player input when player config is shown
     useEffect(() => {
         if (props.showPlayers) {
             nameInputRef.current.focus();
@@ -166,80 +122,37 @@ const GameConfig = props => {
             </div>
 
             {props.showTiles && !props.gameLocked &&
-                <>
-                    <div className='d-flex flex-row align-items-center mt-3'>
-                        <div className='form-floating'>
-                            <Form.Select id="tileCount" className="w-auto"
-                                         onChange={handleCountChange}
-                                         disabled={props.gameLocked}>
-                                <option value='[0,0]'>Select count</option>
+                <div className='d-flex flex-row align-items-center mt-3'>
+                    <div className='form-floating'>
+                        <Form.Select id="tileCount" className="w-auto"
+                                     onChange={handleCountChange}
+                                     disabled={props.gameLocked}>
+                            <option value='[0,0]'>Select count</option>
 
-                                {gridOptions.map((option, i) => (
-                                    <option key={i}
-                                            value={'[' + option[0] + ',' + option[1] + ']'}>
-                                        {option[0] * option[1]} ({option[0]} x {option[1]})
-                                    </option>
-                                ))}
-                            </Form.Select>
-                            <Form.Label htmlFor="tileCount">Tile Count</Form.Label>
-                        </div>
-
-                        <div className='ms-2 ms-sm-3'>
-                            <Form.Group>
-                                <Form.Check type="checkbox" id='grayscaleCheckbox' label="Gray"
-                                            defaultChecked={props.grayscale}
-                                            onClick={e => props.onSetGrayscale(e.currentTarget.checked)}></Form.Check>
-                            </Form.Group>
-
-                            <Form.Group>
-                                <Form.Check type="checkbox" id='blurCheckbox' label="Blur"
-                                            defaultChecked={props.blur}
-                                            onClick={e => props.onSetBlur(e.currentTarget.checked)}></Form.Check>
-                            </Form.Group>
-                        </div>
+                            {gridOptions.map((option, i) => (
+                                <option key={i}
+                                        value={'[' + option[0] + ',' + option[1] + ']'}>
+                                    {option[0] * option[1]} ({option[0]} x {option[1]})
+                                </option>
+                            ))}
+                        </Form.Select>
+                        <Form.Label htmlFor="tileCount">Tile Count</Form.Label>
                     </div>
 
-                    <Form.Group className='mt-2'>
-                        <Form.Check type="checkbox" id='customImagesCheckbox' label="Use custom images"
-                                    defaultChecked={props.useCustomImages}
-                                    onClick={e => props.onSetUseCustomImages(e.currentTarget.checked)}></Form.Check>
-                    </Form.Group>
+                    <div className='ms-2 ms-sm-3'>
+                        <Form.Group>
+                            <Form.Check type="checkbox" id='grayscaleCheckbox' label="Gray"
+                                        defaultChecked={props.grayscale}
+                                        onClick={e => props.onSetGrayscale(e.currentTarget.checked)}></Form.Check>
+                        </Form.Group>
 
-                    {props.useCustomImages && props.gridDimensions &&
-                        <>
-                            <Row className='mt-2'>
-                                <Col xs={9} sm={6}>
-                                    <Form.Control type='text' placeholder='Enter a secure image address' value={image}
-                                                  onChange={event => setImage(event.target.value)}
-                                                  onKeyUp={handleImageInputKeyup}
-                                                  ref={imageInputRef}/>
-                                </Col>
-
-                                <Col xs={3} sm={6} className='text-end text-sm-start'>
-                                    <Button variant='secondary'
-                                            onClick={handleAddImage}><BiImageAdd className='lead'/></Button>
-                                </Col>
-                            </Row>
-
-                            {props.customImages.length > 0 &&
-                                <h3 className='lead my-3'>Images
-                                    ({props.customImages.length} of {getTileCount() / 2})</h3>
-                            }
-
-                            {props.customImages.map(image => (
-                                <Row className='mt-2' key={image.url}>
-                                    <Col xs={9} sm={6}>{image.url}</Col>
-
-                                    <Col xs={3} sm={6} className='text-end text-sm-start'>
-                                        <Button variant='secondary' onClick={() => props.removeCustomImage(image.url)}>
-                                            <MdDelete className='lead'/>
-                                        </Button>
-                                    </Col>
-                                </Row>
-                            ))}
-                        </>
-                    }
-                </>
+                        <Form.Group>
+                            <Form.Check type="checkbox" id='blurCheckbox' label="Blur"
+                                        defaultChecked={props.blur}
+                                        onClick={e => props.onSetBlur(e.currentTarget.checked)}></Form.Check>
+                        </Form.Group>
+                    </div>
+                </div>
             }
 
             {props.showPlayers && !props.gameLocked &&

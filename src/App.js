@@ -20,8 +20,6 @@ function App() {
     const [guessCount, setGuessCount] = useState(0);
     const [grayscale, setGrayscale] = useState(false);
     const [blur, setBlur] = useState(false);
-    const [useCustomImages, setUseCustomImages] = useState(false);
-    const [customImages, setCustomImages] = useState([]);
 
     const shuffle = array => {
         for (let i = array.length - 1; i > 0; i--) {
@@ -91,7 +89,6 @@ function App() {
 
     const handleStartButtonClick = () => {
         setGameLocked(true);
-        setShowTiles(false);
         setShowPlayers(false);
 
         // randomize players if necessary
@@ -138,15 +135,7 @@ function App() {
         }));
     }
 
-    const handleAddImage = url => {
-        setCustomImages(customImages => [...customImages, {url: url}]);
-    }
-
-    const handleRemoveImage = url => {
-        setCustomImages(customImages.filter(image => image.url !== url));
-    }
-
-    const handleAddPlayer = name => {
+    const handleAddPlayer = (name) => {
         setPlayers(players => [...players, {name: name, score: 0}]);
     }
 
@@ -259,11 +248,9 @@ function App() {
         }
 
         if (Array.isArray(gridDimensions)) {
-            if (!useCustomImages) {
-                getTiles((gridDimensions[0] * gridDimensions[1] / 2));
-            }
+            getTiles((gridDimensions[0] * gridDimensions[1] / 2));
         }
-    }, [blur, useCustomImages, grayscale, gridDimensions]);
+    }, [blur, grayscale, gridDimensions]);
 
     // set active player
     useEffect(() => {
@@ -303,14 +290,12 @@ function App() {
             + (grayscale ? ' grayscale-mode' : '')}>
             <Row>
                 <GameConfig
-                    onTileCountChange={grid => setGridDimensions(JSON.parse(grid))}
+                    onTileCountChange={(grid) => setGridDimensions(JSON.parse(grid))}
                     gameLocked={gameLocked}
                     gridDimensions={gridDimensions}
                     players={players}
                     showTiles={showTiles}
                     onSetShowTiles={handleSetShowTiles}
-                    addCustomImage={handleAddImage}
-                    removeCustomImage={handleRemoveImage}
                     showPlayers={showPlayers}
                     onSetShowPlayers={handleSetShowPlayers}
                     currentPlayer={currentPlayer}
@@ -324,10 +309,7 @@ function App() {
                     grayscale={grayscale}
                     onSetGrayscale={val => setGrayscale(val)}
                     blur={blur}
-                    onSetBlur={val => setBlur(val)}
-                    useCustomImages={useCustomImages}
-                    onSetUseCustomImages={() => setUseCustomImages(!useCustomImages)}
-                    customImages={customImages}/>
+                    onSetBlur={val => setBlur(val)}/>
             </Row>
 
             <Row className='flex-fill'>
