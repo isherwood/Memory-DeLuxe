@@ -2,7 +2,6 @@ import React, {useEffect, useRef, useState} from "react";
 import {Button, Col, Form, Row} from 'react-bootstrap';
 import ButtonWithConfirm from "../ButtonWithConfirm/ButtonWithConfirm";
 import {FaPlay, FaStop, FaUserMinus, FaUserPlus, FaUsers} from "react-icons/fa";
-import {IoGridSharp} from "react-icons/io5";
 
 const GameConfig = props => {
     const [name, setName] = useState('');
@@ -31,10 +30,6 @@ const GameConfig = props => {
         [8, 8],
         [10, 10]
     ]
-
-    const handleShowTiles = () => {
-        props.onSetShowTiles(!props.showTiles);
-    }
 
     const handleShowPlayers = () => {
         props.onSetShowPlayers(!props.showPlayers);
@@ -65,17 +60,41 @@ const GameConfig = props => {
             <div className='d-flex align-items-center mt-3'>
                 {!props.gameLocked &&
                     <>
-                        <Button variant='primary' className='btn-xl'
-                                onClick={handleShowTiles}>
-                            <IoGridSharp className='lead'/>
-                            <span className='d-none d-md-inline ms-2'>Tiles</span>
-                        </Button>
+                        <div className='form-floating'>
+                            <Form.Select id="tileCount" className="w-auto"
+                                         onChange={handleCountChange}
+                                         disabled={props.gameLocked}>
+                                <option value='[0,0]'>Select count</option>
+
+                                {gridOptions.map((option, i) => (
+                                    <option key={i}
+                                            value={'[' + option[0] + ',' + option[1] + ']'}>
+                                        {option[0] * option[1]} ({option[0]} x {option[1]})
+                                    </option>
+                                ))}
+                            </Form.Select>
+                            <Form.Label htmlFor="tileCount">Tile Count</Form.Label>
+                        </div>
 
                         <Button variant='primary' className='btn-xl ms-2 ms-sm-3'
                                 onClick={handleShowPlayers}>
                             <FaUsers className='lead'/>
-                            <span className='d-none d-md-inline ms-2'>Players</span>
+                            <span className='d-none d-md-inline ms-2'>Players (optional)</span>
                         </Button>
+
+                        <div className='ms-2 ms-sm-3'>
+                            <Form.Group>
+                                <Form.Check type="checkbox" id='grayscaleCheckbox' label="Gray"
+                                            defaultChecked={props.grayscale}
+                                            onClick={e => props.onSetGrayscale(e.currentTarget.checked)}></Form.Check>
+                            </Form.Group>
+
+                            <Form.Group>
+                                <Form.Check type="checkbox" id='blurCheckbox' label="Blur"
+                                            defaultChecked={props.blur}
+                                            onClick={e => props.onSetBlur(e.currentTarget.checked)}></Form.Check>
+                            </Form.Group>
+                        </div>
                     </>
                 }
 
@@ -120,40 +139,6 @@ const GameConfig = props => {
                     }
                 </div>
             </div>
-
-            {props.showTiles && !props.gameLocked &&
-                <div className='d-flex flex-row align-items-center mt-3'>
-                    <div className='form-floating'>
-                        <Form.Select id="tileCount" className="w-auto"
-                                     onChange={handleCountChange}
-                                     disabled={props.gameLocked}>
-                            <option value='[0,0]'>Select count</option>
-
-                            {gridOptions.map((option, i) => (
-                                <option key={i}
-                                        value={'[' + option[0] + ',' + option[1] + ']'}>
-                                    {option[0] * option[1]} ({option[0]} x {option[1]})
-                                </option>
-                            ))}
-                        </Form.Select>
-                        <Form.Label htmlFor="tileCount">Tile Count</Form.Label>
-                    </div>
-
-                    <div className='ms-2 ms-sm-3'>
-                        <Form.Group>
-                            <Form.Check type="checkbox" id='grayscaleCheckbox' label="Gray"
-                                        defaultChecked={props.grayscale}
-                                        onClick={e => props.onSetGrayscale(e.currentTarget.checked)}></Form.Check>
-                        </Form.Group>
-
-                        <Form.Group>
-                            <Form.Check type="checkbox" id='blurCheckbox' label="Blur"
-                                        defaultChecked={props.blur}
-                                        onClick={e => props.onSetBlur(e.currentTarget.checked)}></Form.Check>
-                        </Form.Group>
-                    </div>
-                </div>
-            }
 
             {props.showPlayers && !props.gameLocked &&
                 <div className='mt-3'>
