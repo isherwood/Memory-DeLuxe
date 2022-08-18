@@ -6,16 +6,15 @@ import {IoGridSharp} from "react-icons/io5";
 import {BiImageAdd} from "react-icons/bi";
 import {MdDelete} from "react-icons/md";
 
-import './styles.css';
-import warningTriangle from '../../images/warning-triangle.png';
-
 const GameConfig = props => {
     const [name, setName] = useState('');
     const nameInputRef = useRef(null);
-    const [imageUrl, setImageUrl] = useState('');
+    const [image, setImage] = useState('');
     const imageInputRef = useRef(null);
-    const [tileCount, setTileCount] = useState(0);
-    const [startButtonEnabled, setStartButtonEnabled] = useState(false);
+
+    const getTileCount = () => {
+        return props.gridDimensions[0] * props.gridDimensions[1];
+    }
 
     const gridOptions = [
         [2, 3], [3, 2],
@@ -58,11 +57,11 @@ const GameConfig = props => {
     }
 
     const handleAddImage = () => {
-        const imageValid = imageUrl && isValidUrl(imageUrl);
+        const imageValid = image && isValidUrl(image);
 
-        if (imageValid && !props.customImages.filter(image => image.url === imageUrl).length > 0) {
-            props.addCustomImage(imageUrl);
-            setImageUrl('');
+        if (imageValid && !props.customImages.filter(image => image.url === image).length) {
+            props.addCustomImage(image);
+            setImage('');
             imageInputRef.current.focus();
         }
     }
@@ -78,7 +77,7 @@ const GameConfig = props => {
     }
 
     const handleAddPlayer = () => {
-        if (name && !props.players.filter(player => player.name === name).length > 0) {
+        if (name && !props.players.filter(player => player.name === name).length) {
             props.addPlayer(name);
             setName('');
             nameInputRef.current.focus();
@@ -104,18 +103,6 @@ const GameConfig = props => {
             nameInputRef.current.focus();
         }
     }, [props.showPlayers]);
-
-    // enable the start button when conditions allow
-    useEffect(() => {
-        setStartButtonEnabled(tileCount > 0
-            && (!props.useCustomImages || props.customImages.length * 2 === tileCount)
-        );
-    }, [props.customImages, props.gridDimensions, props.useCustomImages, tileCount])
-
-    // update tile count when grid dimensions change
-    useEffect(() => {
-        setTileCount(props.gridDimensions[0] * props.gridDimensions[1]);
-    }, [props.gridDimensions])
 
     return (
         <>
@@ -154,7 +141,7 @@ const GameConfig = props => {
                     {!props.gameLocked &&
                         <button className='btn btn-success btn-xl ms-3'
                                 onClick={props.onStartButtonClick}
-                                disabled={!startButtonEnabled}>
+                                disabled={props.gridDimensions[0] === 0}>
                             <FaPlay className='lead'/>
                             <span className='d-none d-md-inline ms-2'>Start Game</span>
                         </button>
@@ -213,52 +200,37 @@ const GameConfig = props => {
                     </div>
 
                     <Form.Group className='mt-2'>
-                        <Form.Check type="checkbox" id='customImagesCheckbox' label="Use custom image addresses"
+                        <Form.Check type="checkbox" id='customImagesCheckbox' label="Use custom images"
                                     defaultChecked={props.useCustomImages}
                                     onClick={e => props.onSetUseCustomImages(e.currentTarget.checked)}></Form.Check>
                     </Form.Group>
 
-                    {props.useCustomImages && tileCount !== 0 ?
+                    {props.useCustomImages && props.gridDimensions &&
                         <>
+                            <Row className='mt-2'>
+                                <Col xs={9} sm={6}>
+                                    <Form.Control type='text' placeholder='Enter a secure image address' value={image}
+                                                  onChange={event => setImage(event.target.value)}
+                                                  onKeyUp={handleImageInputKeyup}
+                                                  ref={imageInputRef}/>
+                                </Col>
 
-                            {(props.customImages.length === 0 || (props.customImages.length * 2 < tileCount)) &&
-                                <>
-                                    <p className='mt-2'>Image addresses must be secure (https) and unique.</p>
-
-                                    <Row>
-                                        <Col xs={9} sm={8}>
-                                            <Form.Control type='text' placeholder='Enter an image address'
-                                                          value={imageUrl}
-                                                          onChange={event => setImageUrl(event.target.value)}
-                                                          onKeyUp={handleImageInputKeyup}
-                                                          ref={imageInputRef}/>
-                                        </Col>
-
-                                        <Col xs={3} sm={4} className='text-end text-sm-start'>
-                                            <Button variant='secondary'
-                                                    onClick={handleAddImage}><BiImageAdd className='lead'/></Button>
-                                        </Col>
-                                    </Row>
-                                </>
-                            }
+                                <Col xs={3} sm={6} className='text-end text-sm-start'>
+                                    <Button variant='secondary'
+                                            onClick={handleAddImage}><BiImageAdd className='lead'/></Button>
+                                </Col>
+                            </Row>
 
                             {props.customImages.length > 0 &&
-                                <h3 className='lead my-3 mt-4 mb-0'>Images
-                                    ({props.customImages.length} of {tileCount / 2})</h3>
+                                <h3 className='lead my-3'>Images
+                                    ({props.customImages.length} of {getTileCount() / 2})</h3>
                             }
 
                             {props.customImages.map(image => (
                                 <Row className='mt-2' key={image.url}>
-                                    <Col xs={9} sm={8} className='d-flex justify-content-between align-items-end'>
-                                        <span className='custom-image-url me-2' dir='rtl'>{image.url}</span>
-                                        <img src={image.url} alt=''
-                                             onError={({ currentTarget }) => {
-                                                 currentTarget.src=warningTriangle;
-                                             }}
-                                             className='custom-image-thumb'/>
-                                    </Col>
+                                    <Col xs={9} sm={6}>{image.url}</Col>
 
-                                    <Col xs={3} sm={4} className='text-end text-sm-start'>
+                                    <Col xs={3} sm={6} className='text-end text-sm-start'>
                                         <Button variant='secondary' onClick={() => props.removeCustomImage(image.url)}>
                                             <MdDelete className='lead'/>
                                         </Button>
@@ -266,15 +238,13 @@ const GameConfig = props => {
                                 </Row>
                             ))}
                         </>
-                        : <p className='pt-2'>Please select a tile count.</p>
                     }
                 </>
             }
 
             {props.showPlayers && !props.gameLocked &&
                 <div className='mt-3'>
-                    <p>Optionally add two or more players to track game order and score. Names must be
-                        unique.</p>
+                    <p>Optionally add two or more players to track game order and score. Names must be unique.</p>
 
                     <Form.Group className='mb-3'>
                         <Form.Check type="checkbox" id='randomizePlayersCheckbox' label="Randomize players"
