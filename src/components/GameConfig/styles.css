@@ -1,0 +1,8 @@
+.custom-image-thumb {
+    height: 38px;
+}
+.custom-image-url {
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+}

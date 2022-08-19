@@ -2,14 +2,20 @@ import React, {useEffect, useRef, useState} from "react";
 import {Button, Col, Form, Row} from 'react-bootstrap';
 import ButtonWithConfirm from "../ButtonWithConfirm/ButtonWithConfirm";
 import {FaPlay, FaStop, FaUserMinus, FaUserPlus, FaUsers} from "react-icons/fa";
+import {IoGridSharp} from "react-icons/io5";
+import {BiImageAdd} from "react-icons/bi";
+import {MdDelete} from "react-icons/md";
+
+import './styles.css';
+import warningTriangle from '../../images/warning-triangle.png';
 
 const GameConfig = props => {
     const [name, setName] = useState('');
     const nameInputRef = useRef(null);
-
-    const handleCountChange = e => {
-        props.onTileCountChange(e.currentTarget.value);
-    }
+    const [imageUrl, setImageUrl] = useState('');
+    const imageInputRef = useRef(null);
+    const [tileCount, setTileCount] = useState(props.gridDimensions[0] * props.gridDimensions[1]);
+    const [startButtonEnabled, setStartButtonEnabled] = useState(false);
 
     const gridOptions = [
         [2, 3], [3, 2],
@@ -31,12 +37,48 @@ const GameConfig = props => {
         [10, 10]
     ]
 
+    const isValidUrl = str => {
+        let url;
+
+        try {
+            url = new URL(str);
+        } catch (_) {
+            return false;
+        }
+
+        return url.protocol === "https:";
+    }
+
+    const handleCountChange = e => {
+        props.onTileCountChange(e.currentTarget.value);
+    }
+
+    const handleShowTiles = () => {
+        props.onSetShowTiles(!props.showTiles);
+    }
+
+    const handleAddImage = () => {
+        const imageValid = imageUrl && isValidUrl(imageUrl);
+
+        if (imageValid && !props.customImages.filter(image => image.url === imageUrl).length > 0) {
+            props.addCustomImage(imageUrl);
+            setImageUrl('');
+            imageInputRef.current.focus();
+        }
+    }
+
+    const handleImageInputKeyup = event => {
+        if (event.key === 'Enter') {
+            handleAddImage();
+        }
+    }
+
     const handleShowPlayers = () => {
         props.onSetShowPlayers(!props.showPlayers);
     }
 
     const handleAddPlayer = () => {
-        if (name && !props.players.filter(player => player.name === name).length) {
+        if (name && !props.players.filter(player => player.name === name).length > 0) {
             props.addPlayer(name);
             setName('');
             nameInputRef.current.focus();
@@ -49,53 +91,48 @@ const GameConfig = props => {
         }
     }
 
+    // focus the image input when tile config is shown
+    useEffect(() => {
+        if (props.showTiles && props.useCustomImages && props.tileCount) {
+            imageInputRef.current.focus();
+        }
+    }, [props.showTiles, props.tileCount, props.useCustomImages]);
+
+    // focus the player input when player config is shown
     useEffect(() => {
         if (props.showPlayers) {
             nameInputRef.current.focus();
         }
     }, [props.showPlayers]);
 
+    // enable the start button when conditions allow
+    useEffect(() => {
+        setStartButtonEnabled(tileCount > 0
+            && (!props.useCustomImages || props.customImages.length * 2 === tileCount)
+        );
+    }, [props.customImages, props.gridDimensions, props.useCustomImages, tileCount])
+
+    // update tile count when grid dimensions change
+    useEffect(() => {
+        setTileCount(props.gridDimensions[0] * props.gridDimensions[1]);
+    }, [props.gridDimensions])
+
     return (
         <>
             <div className='d-flex align-items-center mt-3'>
                 {!props.gameLocked &&
                     <>
-                        <div className='form-floating'>
-                            <Form.Select id="tileCount" className="w-auto"
-                                         value={JSON.stringify(props.gridDimensions)}
-                                         onChange={handleCountChange}
-                                         disabled={props.gameLocked}>
-                                <option value='[0,0]'>Select count</option>
-
-                                {gridOptions.map((option, i) => (
-                                    <option key={i}
-                                            value={'[' + option[0] + ',' + option[1] + ']'}>
-                                        {option[0] * option[1]} ({option[0]} x {option[1]})
-                                    </option>
-                                ))}
-                            </Form.Select>
-                            <Form.Label htmlFor="tileCount">Tile Count</Form.Label>
-                        </div>
-
-                        <Button variant='primary' className='btn-xl ms-2 ms-sm-3'
-                                onClick={handleShowPlayers}>
-                            <FaUsers className='lead'/>
-                            <span className='d-none d-md-inline ms-2'>Players (optional)</span>
+                        <Button variant='primary' className='btn-xl'
+                                onClick={handleShowTiles}>
+                            <IoGridSharp className='lead'/>
+                            <span className='d-none d-md-inline ms-2'>Tiles</span>
                         </Button>
 
-                        <div className='ms-2 ms-sm-3'>
-                            <Form.Group>
-                                <Form.Check type="checkbox" id='grayscaleCheckbox' label="Gray"
-                                            defaultChecked={props.grayscale}
-                                            onClick={e => props.onSetGrayscale(e.currentTarget.checked)}></Form.Check>
-                            </Form.Group>
-
-                            <Form.Group>
-                                <Form.Check type="checkbox" id='blurCheckbox' label="Blur"
-                                            defaultChecked={props.blur}
-                                            onClick={e => props.onSetBlur(e.currentTarget.checked)}></Form.Check>
-                            </Form.Group>
-                        </div>
+                        <Button variant='primary' className='btn-xl ms-2'
+                                onClick={handleShowPlayers}>
+                            <FaUsers className='lead'/>
+                            <span className='d-none d-md-inline ms-2'>Players</span>
+                        </Button>
                     </>
                 }
 
@@ -117,7 +154,7 @@ const GameConfig = props => {
                     {!props.gameLocked &&
                         <button className='btn btn-success btn-xl ms-3'
                                 onClick={props.onStartButtonClick}
-                                disabled={props.gridDimensions[0] === 0}>
+                                disabled={!startButtonEnabled}>
                             <FaPlay className='lead'/>
                             <span className='d-none d-md-inline ms-2'>Start Game</span>
                         </button>
@@ -141,9 +178,112 @@ const GameConfig = props => {
                 </div>
             </div>
 
+            {props.showTiles && !props.gameLocked &&
+                <>
+                    <div className='d-flex flex-row align-items-center mt-3'>
+                        <div className='form-floating'>
+                            <Form.Select id="tileCount" className="w-auto"
+                                         value={JSON.stringify(props.gridDimensions)}
+                                         onChange={handleCountChange}
+                                         disabled={props.gameLocked}>
+                                <option value='[0,0]'>Select count</option>
+
+                                {gridOptions.map((option, i) => (
+                                    <option key={i}
+                                            value={'[' + option[0] + ',' + option[1] + ']'}>
+                                        {option[0] * option[1]} ({option[0]} x {option[1]})
+                                    </option>
+                                ))}
+                            </Form.Select>
+                            <Form.Label htmlFor="tileCount">Tile Count</Form.Label>
+                        </div>
+
+                        <div className='ms-2 ms-sm-3'>
+                            <Form.Group>
+                                <Form.Check type="checkbox" id='grayscaleCheckbox'
+                                            label="Gray" className='mb-0'
+                                            defaultChecked={props.grayscale}
+                                            disabled={props.useCustomImages}
+                                            onClick={e => props.onSetGrayscale(e.currentTarget.checked)}></Form.Check>
+                            </Form.Group>
+
+                            <Form.Group>
+                                <Form.Check type="checkbox" id='blurCheckbox'
+                                            label="Blur" className='mb-0'
+                                            defaultChecked={props.blur}
+                                            disabled={props.useCustomImages}
+                                            onClick={e => props.onSetBlur(e.currentTarget.checked)}></Form.Check>
+                            </Form.Group>
+
+                            <Form.Group>
+                                <Form.Check type="checkbox" id='customImagesCheckbox'
+                                            label="Custom" className='mb-0'
+                                            defaultChecked={props.useCustomImages}
+                                            onClick={e => props.onSetUseCustomImages(e.currentTarget.checked)}></Form.Check>
+                            </Form.Group>
+                        </div>
+                    </div>
+
+                    {props.useCustomImages && tileCount === 0 &&
+                        <p className='pt-2'>Please select a tile count.</p>
+                    }
+
+                    {props.useCustomImages && tileCount !== 0 &&
+                        <>
+
+                            {(props.customImages.length === 0 || (props.customImages.length * 2 < tileCount)) &&
+                                <>
+                                    <p className='mt-2'>Image addresses must be secure (https) and unique.</p>
+
+                                    <Row>
+                                        <Col xs={9} sm={8}>
+                                            <Form.Control type='text' placeholder='Enter an image address'
+                                                          value={imageUrl}
+                                                          onChange={event => setImageUrl(event.target.value)}
+                                                          onKeyUp={handleImageInputKeyup}
+                                                          ref={imageInputRef}/>
+                                        </Col>
+
+                                        <Col xs={3} sm={4} className='text-end text-sm-start'>
+                                            <Button variant='secondary'
+                                                    onClick={handleAddImage}><BiImageAdd className='lead'/></Button>
+                                        </Col>
+                                    </Row>
+                                </>
+                            }
+
+                            {props.customImages.length > 0 &&
+                                <h3 className='lead my-3 mt-4 mb-0'>Images
+                                    ({props.customImages.length} of {tileCount / 2})</h3>
+                            }
+
+                            {props.customImages.map(image => (
+                                <Row className='mt-2' key={image.url}>
+                                    <Col className='d-flex align-items-end'>
+                                        <span className='custom-image-url me-2' dir='rtl'>{image.url}</span>
+
+                                        <img src={image.url} alt=''
+                                             onError={({currentTarget}) => {
+                                                 currentTarget.src = warningTriangle;
+                                             }}
+                                             className='custom-image-thumb ms-auto'/>
+
+                                        <Button variant='secondary' onClick={() => props.removeCustomImage(image.url)}
+                                                className='ms-2'>
+                                            <MdDelete className='lead'/>
+                                        </Button>
+                                    </Col>
+                                </Row>
+                            ))}
+                        </>
+                    }
+                </>
+            }
+
             {props.showPlayers && !props.gameLocked &&
                 <div className='mt-3'>
-                    <p>Optionally add two or more players to track game order and score. Names must be unique.</p>
+                    <p>Optionally add two or more players to track game order and score. Names must be
+                        unique.</p>
 
                     <Form.Group className='mb-3'>
                         <Form.Check type="checkbox" id='randomizePlayersCheckbox' label="Randomize players"

@@ -7,6 +7,7 @@ import GameConfig from "./components/GameConfig/GameConfig";
 
 function App() {
     const [tiles, setTiles] = useState([]);
+    const [showTiles, setShowTiles] = useState(false);
     const [firstTile, setFirstTile] = useState({});
     const [secondTile, setSecondTile] = useState({});
     const [gridDimensions, setGridDimensions] = useState([0, 0]);
@@ -19,6 +20,8 @@ function App() {
     const [guessCount, setGuessCount] = useState(0);
     const [grayscale, setGrayscale] = useState(false);
     const [blur, setBlur] = useState(false);
+    const [useCustomImages, setUseCustomImages] = useState(false);
+    const [customImages, setCustomImages] = useState([]);
 
     const shuffle = array => {
         for (let i = array.length - 1; i > 0; i--) {
@@ -27,6 +30,16 @@ function App() {
         }
 
         return array;
+    }
+
+    const handleSetShowTiles = () => {
+        setShowTiles(!showTiles);
+        if (!showTiles) setShowPlayers(false);
+    }
+
+    const handleSetShowPlayers = () => {
+        setShowPlayers(!showPlayers);
+        if (!showPlayers) setShowTiles(false);
     }
 
     const handleTileClick = (event, tile) => {
@@ -78,7 +91,15 @@ function App() {
 
     const handleStartButtonClick = () => {
         setGameLocked(true);
+        setShowTiles(false);
         setShowPlayers(false);
+        setTiles([]);
+
+        if (useCustomImages) {
+            getTilesFromCustomImages();
+        } else {
+            getTilesFromApi();
+        }
 
         // randomize players if necessary
         if (randomizePlayers) {
@@ -103,12 +124,12 @@ function App() {
         setGameLocked(false);
         setGuessCount(0);
 
-        // reset grid to current dimensions to fetch new images
-        const currentGridDimensions = gridDimensions;
-        setGridDimensions([0, 0]);
-        setTimeout(() => {
-            setGridDimensions(currentGridDimensions);
-        });
+        // reset tiles
+        setTiles(current => current.map(obj => {
+            obj.shown = false;
+            obj.matched = false;
+            return obj;
+        }));
 
         // zero scores & set the first player as active
         setPlayers(current => current.map(obj => {
@@ -124,7 +145,15 @@ function App() {
         }));
     }
 
-    const handleAddPlayer = (name) => {
+    const handleAddImage = url => {
+        setCustomImages(customImages => [...customImages, {url: url}]);
+    }
+
+    const handleRemoveImage = url => {
+        setCustomImages(customImages.filter(image => image.url !== url));
+    }
+
+    const handleAddPlayer = name => {
         setPlayers(players => [...players, {name: name, score: 0}]);
     }
 
@@ -199,47 +228,65 @@ function App() {
         }
     }
 
-    // initialize tiles
-    useEffect(() => {
-        const getTiles = count => {
-            setTiles([]);
-            let newTiles = [];
+    const getTilesFromCustomImages = () => {
+        let newTiles = [];
 
-            [...Array(count)].forEach((v, i) => {
-                const seed = Math.floor(Math.random() * 99999) + 1;
-                let imgUrl = 'https://picsum.photos/seed/' + seed + '/600/400';
-
-                if (grayscale && blur) {
-                    imgUrl += '?grayscale&blur=10';
-                } else if (grayscale) {
-                    imgUrl += '?grayscale';
-                } else if (blur) {
-                    imgUrl += '?blur=10';
-                }
-
-                // add each image twice
-                newTiles.push({
-                    id: i + 'a',
-                    url: imgUrl,
-                    shown: false,
-                    matched: false
-                });
-                newTiles.push({
-                    id: i + 'b',
-                    url: imgUrl,
-                    shown: false,
-                    matched: false
-                });
+        customImages.forEach((v, i) => {
+            // add each image twice
+            newTiles.push({
+                id: 'a' + i,
+                url: v.url,
+                shown: false,
+                matched: false
             });
+            newTiles.push({
+                id: 'b' + i,
+                url: v.url,
+                shown: false,
+                matched: false
+            });
+        });
 
-            newTiles = shuffle(newTiles);
-            setTiles(newTiles);
-        }
+        newTiles = shuffle(newTiles);
+        setTiles(newTiles);
 
-        if (Array.isArray(gridDimensions)) {
-            getTiles((gridDimensions[0] * gridDimensions[1] / 2));
-        }
-    }, [blur, grayscale, gridDimensions]);
+        setTimeout(() => console.log(tiles));
+    }
+
+    const getTilesFromApi = () => {
+        const count = (gridDimensions[0] * gridDimensions[1] / 2);
+        let newTiles = [];
+
+        [...Array(count)].forEach((v, i) => {
+            const seed = Math.floor(Math.random() * 99999) + 1;
+            let imgUrl = 'https://picsum.photos/seed/' + seed + '/600/400';
+
+            if (grayscale && blur) {
+                imgUrl += '?grayscale&blur=10';
+            } else if (grayscale) {
+                imgUrl += '?grayscale';
+            } else if (blur) {
+                imgUrl += '?blur=10';
+            }
+
+            // add each image twice
+            newTiles.push({
+                id: i + 'a',
+                url: imgUrl,
+                shown: false,
+                matched: false
+            });
+            newTiles.push({
+                id: i + 'b',
+                url: imgUrl,
+                shown: false,
+                matched: false
+            });
+        });
+
+        newTiles = shuffle(newTiles);
+        setTiles(newTiles);
+    }
 
     // set active player
     useEffect(() => {
@@ -276,31 +323,36 @@ function App() {
     return (
         <Container fluid className={'d-flex flex-column vh-100'
             + (gameLocked ? ' game-locked' : '')
-            + (grayscale ? ' grayscale-mode' : '')}>
-            <Row>
-                <GameConfig
-                    onTileCountChange={grid => setGridDimensions(JSON.parse(grid))}
-                    gameLocked={gameLocked}
-                    gridDimensions={gridDimensions}
-                    players={players}
-                    showPlayers={showPlayers}
-                    currentPlayer={currentPlayer}
-                    addPlayer={handleAddPlayer}
-                    removePlayer={handleRemovePlayer}
-                    randomizePlayers={randomizePlayers}
-                    onSetRandomizePlayers={val => setRandomizePlayers(val)}
-                    onStartButtonClick={handleStartButtonClick}
-                    onEndButtonClick={handleEndButtonClick}
-                    onSetShowPlayers={setShowPlayers}
-                    guessCount={guessCount}
-                    grayscale={grayscale}
-                    onSetGrayscale={val => setGrayscale(val)}
-                    blur={blur}
-                    onSetBlur={val => setBlur(val)}/>
-            </Row>
+            + (grayscale && !useCustomImages ? ' grayscale-mode' : '')}>
+            <GameConfig
+                onTileCountChange={grid => setGridDimensions(JSON.parse(grid))}
+                gameLocked={gameLocked}
+                gridDimensions={gridDimensions}
+                players={players}
+                showTiles={showTiles}
+                onSetShowTiles={handleSetShowTiles}
+                addCustomImage={handleAddImage}
+                removeCustomImage={handleRemoveImage}
+                showPlayers={showPlayers}
+                onSetShowPlayers={handleSetShowPlayers}
+                currentPlayer={currentPlayer}
+                addPlayer={handleAddPlayer}
+                removePlayer={handleRemovePlayer}
+                randomizePlayers={randomizePlayers}
+                onSetRandomizePlayers={val => setRandomizePlayers(val)}
+                onStartButtonClick={handleStartButtonClick}
+                onEndButtonClick={handleEndButtonClick}
+                guessCount={guessCount}
+                grayscale={grayscale}
+                onSetGrayscale={val => setGrayscale(val)}
+                blur={blur}
+                onSetBlur={val => setBlur(val)}
+                useCustomImages={useCustomImages}
+                onSetUseCustomImages={() => setUseCustomImages(!useCustomImages)}
+                customImages={customImages}/>
 
             <Row className='flex-fill'>
-                {tiles.length > 0 && !showPlayers ?
+                {tiles.length > 0 && !showPlayers && !(useCustomImages && showTiles) ?
                     <GameBoard
                         tiles={tiles}
                         gridDimensions={gridDimensions}
