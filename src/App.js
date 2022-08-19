@@ -279,7 +279,7 @@ function App() {
             + (grayscale ? ' grayscale-mode' : '')}>
             <Row>
                 <GameConfig
-                    onTileCountChange={(grid) => setGridDimensions(JSON.parse(grid))}
+                    onTileCountChange={grid => setGridDimensions(JSON.parse(grid))}
                     gameLocked={gameLocked}
                     gridDimensions={gridDimensions}
                     players={players}

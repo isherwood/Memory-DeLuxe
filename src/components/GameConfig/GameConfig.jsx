@@ -62,6 +62,7 @@ const GameConfig = props => {
                     <>
                         <div className='form-floating'>
                             <Form.Select id="tileCount" className="w-auto"
+                                         value={JSON.stringify(props.gridDimensions)}
                                          onChange={handleCountChange}
                                          disabled={props.gameLocked}>
                                 <option value='[0,0]'>Select count</option>
