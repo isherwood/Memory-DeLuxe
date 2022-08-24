@@ -249,8 +249,6 @@ function App() {
 
         newTiles = shuffle(newTiles);
         setTiles(newTiles);
-
-        setTimeout(() => console.log(tiles));
     }
 
     const getTilesFromApi = () => {

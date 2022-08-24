@@ -58,10 +58,11 @@ const GameConfig = props => {
     }
 
     const handleAddImage = () => {
-        const imageValid = imageUrl && isValidUrl(imageUrl);
+        const trimmedImageUrl = imageUrl.trim();
+        const imageValid = isValidUrl(trimmedImageUrl);
 
-        if (imageValid && !props.customImages.filter(image => image.url === imageUrl).length > 0) {
-            props.addCustomImage(imageUrl);
+        if (imageValid && !props.customImages.filter(image => image.url === trimmedImageUrl).length > 0) {
+            props.addCustomImage(trimmedImageUrl);
             setImageUrl('');
             imageInputRef.current.focus();
         }
@@ -78,8 +79,10 @@ const GameConfig = props => {
     }
 
     const handleAddPlayer = () => {
-        if (name && !props.players.filter(player => player.name === name).length > 0) {
-            props.addPlayer(name);
+        const trimmedName = name.trim();
+
+        if (name && !props.players.filter(player => player.name === trimmedName).length > 0) {
+            props.addPlayer(trimmedName);
             setName('');
             nameInputRef.current.focus();
         }
