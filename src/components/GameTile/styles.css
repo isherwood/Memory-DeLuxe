@@ -25,6 +25,7 @@
 .tile-inner {
     background-size: cover;
     background-position: center;
+    background-repeat: no-repeat;
     counter-increment: tile-count;
     cursor: not-allowed;
 }
