@@ -7,8 +7,6 @@ import {IoGridSharp} from "react-icons/io5";
 const GameConfig = props => {
     const [name, setName] = useState('');
     const nameInputRef = useRef(null);
-    const colCount = props.gridDimensions[0];
-    const rowCount = props.gridDimensions[1];
     const [boardWidth, setBoardWidth] = useState(0);
     const [boardHeight, setBoardHeight] = useState(0);
     const [aspectRatio, setAspectRatio] = useState(1);
@@ -58,16 +56,18 @@ const GameConfig = props => {
         }
     }
 
+    const previewSizeFactor = 2;
+
     const getPreviewStyles = () => {
         if (aspectRatio > 1) {
             return {
-                width: '200px',
-                height: 1 / (aspectRatio / 100 / 2)
+                width: 100 * previewSizeFactor,
+                height: 1 / (aspectRatio / 100 / previewSizeFactor)
             }
         } else {
             return {
-                width: aspectRatio * 100 * 2,
-                height: '200px'
+                width: aspectRatio * 100 * previewSizeFactor,
+                height: 100 * previewSizeFactor
             }
         }
     }
@@ -78,9 +78,9 @@ const GameConfig = props => {
                 <Popover.Body>
                     <div className='tile-grid-preview d-flex flex-column' style={getPreviewStyles()}>
                         {[...Array(rows)].map((v, i) => (
-                            <div className='d-flex flex-fill' key={rowCount + i}>
+                            <div className='d-flex flex-fill' key={props.gridDimensions[1] + i}>
                                 {[...Array(cols)].map((v, j) => (
-                                    <div className='d-flex flex-fill flex-column' key={i * colCount + j}>
+                                    <div className='d-flex flex-fill flex-column' key={i * props.gridDimensions[0] + j}>
                                         <div className='tile-grid-preview-tile flex-fill bg-secondary'/>
                                     </div>
                                 ))}
@@ -163,7 +163,8 @@ const GameConfig = props => {
 
                             <Dropdown.Menu>
                                 {gridOptions.map((option, i) => (
-                                    <OverlayTrigger placement="right" key={i}
+                                    <OverlayTrigger key={i}
+                                                    placement="right"
                                                     overlay={popover(option[1], option[0])}>
                                         <Dropdown.Item
                                             eventKey={'[' + option[0] + ',' + option[1] + ']'}>
