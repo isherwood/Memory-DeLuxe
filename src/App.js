@@ -19,6 +19,7 @@ function App() {
     const [guessCount, setGuessCount] = useState(0);
     const [grayscale, setGrayscale] = useState(false);
     const [blur, setBlur] = useState(false);
+    const [darkMode, setDarkMode] = useState(false);
 
     const shuffle = array => {
         for (let i = array.length - 1; i > 0; i--) {
@@ -122,6 +123,10 @@ function App() {
 
             return obj;
         }));
+    }
+
+    const handleDarkModeButtonClick = () => {
+        setDarkMode(!darkMode);
     }
 
     const handleAddPlayer = (name) => {
@@ -276,7 +281,8 @@ function App() {
     return (
         <Container fluid className={'d-flex flex-column vh-100'
             + (gameLocked ? ' game-locked' : '')
-            + (grayscale ? ' grayscale-mode' : '')}>
+            + (grayscale ? ' grayscale-mode' : '')
+            + (darkMode ? ' dark-mode' : '')}>
             <Row>
                 <GameConfig
                     onTileCountChange={grid => setGridDimensions(JSON.parse(grid))}
@@ -296,7 +302,9 @@ function App() {
                     grayscale={grayscale}
                     onSetGrayscale={val => setGrayscale(val)}
                     blur={blur}
-                    onSetBlur={val => setBlur(val)}/>
+                    onSetBlur={val => setBlur(val)}
+                    darkMode={darkMode}
+                    onDarkModeButtonClick={handleDarkModeButtonClick}/>
             </Row>
 
             <Row className='flex-fill'>
