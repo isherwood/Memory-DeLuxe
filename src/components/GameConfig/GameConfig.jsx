@@ -1,4 +1,4 @@
-import React, {useEffect, useRef, useState} from "react";
+import React, {useEffect, useMemo, useRef, useState} from "react";
 import {Button, Col, Dropdown, Form, OverlayTrigger, Popover, Row} from 'react-bootstrap';
 import ButtonWithConfirm from "../ButtonWithConfirm/ButtonWithConfirm";
 import {FaPlay, FaStop, FaUserMinus, FaUserPlus, FaUsers} from "react-icons/fa";
@@ -9,6 +9,10 @@ const GameConfig = props => {
     const nameInputRef = useRef(null);
     const colCount = props.gridDimensions[0];
     const rowCount = props.gridDimensions[1];
+    const [boardWidth, setBoardWidth] = useState(0);
+    const [boardHeight, setBoardHeight] = useState(0);
+    const [aspectRatio, setAspectRatio] = useState(1);
+    const [windowResized, setWindowResized] = useState(0);
 
     const handleCountChange = val => {
         props.onTileCountChange(val);
@@ -55,17 +59,15 @@ const GameConfig = props => {
     }
 
     const getPreviewStyles = () => {
-        const aspectRatio = window.innerWidth / window.innerHeight;
-
         if (aspectRatio > 1) {
             return {
-                width: '100px',
-                height: 1 / (aspectRatio / 100)
+                width: '200px',
+                height: 1 / (aspectRatio / 100 / 2)
             }
         } else {
             return {
-                width: aspectRatio * 100,
-                height: '100px'
+                width: aspectRatio * 100 * 2,
+                height: '200px'
             }
         }
     }
@@ -90,15 +92,59 @@ const GameConfig = props => {
         );
     }
 
+    window.onresize = () => {
+        // update state to trigger useEffect
+        setWindowResized(windowResized + 1);
+    }
+
+    // https://stackoverflow.com/a/61786423/1264804
+    const debounce = (func, wait, immediate) => {
+        let timeout;
+
+        return (...args) => {
+            const context = this;
+            const later = () => {
+                timeout = null;
+                if (!immediate) func.apply(context, args);
+            };
+            const callNow = immediate && !timeout;
+
+            clearTimeout(timeout);
+            timeout = setTimeout(later, wait);
+            if (callNow) func.apply(context, args);
+        };
+    };
+
+    // https://stackoverflow.com/a/61786423/1264804
+    const doDebounce = useMemo(
+        () => debounce((w, h) => {
+            setAspectRatio(w / h);
+        }, 100),
+        []
+    );
+
     useEffect(() => {
         if (props.showPlayers) {
             nameInputRef.current.focus();
         }
     }, [props.showPlayers]);
 
+    useEffect(() => {
+        doDebounce(boardWidth, boardHeight);
+    }, [boardWidth, boardHeight, doDebounce]);
+
+    useEffect(() => {
+        const getConfigHeight = () => {
+            return document.getElementById('config').offsetHeight;
+        }
+
+        setBoardWidth(window.innerWidth);
+        setBoardHeight(window.innerHeight - getConfigHeight());
+    }, [windowResized]);
+
     return (
         <>
-            <div className='d-flex align-items-center mt-3'>
+            <div id='config' className='d-flex align-items-center mt-3'>
                 {!props.gameLocked &&
                     <>
                         <Dropdown size='lg' className='btn-xl tile-count-selector'
