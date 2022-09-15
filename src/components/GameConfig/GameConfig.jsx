@@ -1,14 +1,19 @@
-import React, {useEffect, useRef, useState} from "react";
-import {Button, Col, Form, Row} from 'react-bootstrap';
+import React, {useEffect, useMemo, useRef, useState} from "react";
+import {Button, Col, Dropdown, Form, OverlayTrigger, Popover, Row} from 'react-bootstrap';
 import ButtonWithConfirm from "../ButtonWithConfirm/ButtonWithConfirm";
 import {FaPlay, FaStop, FaUserMinus, FaUserPlus, FaUsers} from "react-icons/fa";
+import {IoGridSharp} from "react-icons/io5";
 
 const GameConfig = props => {
     const [name, setName] = useState('');
     const nameInputRef = useRef(null);
+    const [boardWidth, setBoardWidth] = useState(0);
+    const [boardHeight, setBoardHeight] = useState(0);
+    const [aspectRatio, setAspectRatio] = useState(1);
+    const [windowResized, setWindowResized] = useState(0);
 
-    const handleCountChange = e => {
-        props.onTileCountChange(e.currentTarget.value);
+    const handleCountChange = val => {
+        props.onTileCountChange(val);
     }
 
     const gridOptions = [
@@ -28,6 +33,8 @@ const GameConfig = props => {
         [7, 8], [8, 7],
         [6, 10], [10, 6],
         [8, 8],
+        [9, 8],
+        [10, 8],
         [10, 10]
     ]
 
@@ -49,41 +56,132 @@ const GameConfig = props => {
         }
     }
 
+    const previewSizeFactor = 2;
+
+    const getPreviewStyles = () => {
+        if (aspectRatio > 1) {
+            return {
+                width: 100 * previewSizeFactor,
+                height: 1 / (aspectRatio / 100 / previewSizeFactor)
+            }
+        } else {
+            return {
+                width: aspectRatio * 100 * previewSizeFactor,
+                height: 100 * previewSizeFactor
+            }
+        }
+    }
+
+    const popover = (rows, cols) => {
+        return (
+            <Popover id="tile-count-popover" className='tile-grid-preview-popover'>
+                <Popover.Body>
+                    <div className='tile-grid-preview d-flex flex-column' style={getPreviewStyles()}>
+                        {[...Array(rows)].map((v, i) => (
+                            <div className='d-flex flex-fill' key={props.gridDimensions[1] + i}>
+                                {[...Array(cols)].map((v, j) => (
+                                    <div className='d-flex flex-fill flex-column' key={i * props.gridDimensions[0] + j}>
+                                        <div className='tile-grid-preview-tile flex-fill bg-secondary'/>
+                                    </div>
+                                ))}
+                            </div>
+                        ))}
+                    </div>
+                </Popover.Body>
+            </Popover>
+        );
+    }
+
+    window.onresize = () => {
+        // update state to trigger useEffect
+        setWindowResized(windowResized + 1);
+    }
+
+    // https://stackoverflow.com/a/61786423/1264804
+    const debounce = (func, wait, immediate) => {
+        let timeout;
+
+        return (...args) => {
+            const context = this;
+            const later = () => {
+                timeout = null;
+                if (!immediate) func.apply(context, args);
+            };
+            const callNow = immediate && !timeout;
+
+            clearTimeout(timeout);
+            timeout = setTimeout(later, wait);
+            if (callNow) func.apply(context, args);
+        };
+    };
+
+    // https://stackoverflow.com/a/61786423/1264804
+    const doDebounce = useMemo(
+        () => debounce((w, h) => {
+            setAspectRatio(w / h);
+        }, 100),
+        []
+    );
+
     useEffect(() => {
         if (props.showPlayers) {
             nameInputRef.current.focus();
         }
     }, [props.showPlayers]);
 
+    useEffect(() => {
+        doDebounce(boardWidth, boardHeight);
+    }, [boardWidth, boardHeight, doDebounce]);
+
+    useEffect(() => {
+        const getConfigHeight = () => {
+            return document.getElementById('config').offsetHeight;
+        }
+
+        setBoardWidth(window.innerWidth);
+        setBoardHeight(window.innerHeight - getConfigHeight());
+    }, [windowResized]);
+
     return (
         <>
-            <div className='d-flex align-items-center mt-3'>
+            <div id='config' className='d-flex align-items-center mt-3'>
                 {!props.gameLocked &&
                     <>
-                        <div className='form-floating'>
-                            <Form.Select id="tileCount" className="w-auto"
-                                         value={JSON.stringify(props.gridDimensions)}
-                                         onChange={handleCountChange}
-                                         disabled={props.gameLocked}>
-                                <option value='[0,0]'>Select count</option>
+                        <Dropdown size='lg' className='btn-xl tile-count-selector'
+                                  disabled={props.gameLocked}
+                                  value={JSON.stringify(props.gridDimensions)}
+                                  onSelect={handleCountChange}>
+                            <Dropdown.Toggle variant="primary">
+                                <IoGridSharp className='lead me-2'/>
+                                <span className='d-none d-md-inline me-1'>
+                                    {props.gridDimensions[0] === 0 && props.gridDimensions[1] === 0
+                                        ? 'Tile Count'
+                                        : `${props.gridDimensions[0]} × ${props.gridDimensions[1]}`
+                                    }
+                                </span>
+                            </Dropdown.Toggle>
 
+                            <Dropdown.Menu>
                                 {gridOptions.map((option, i) => (
-                                    <option key={i}
-                                            value={'[' + option[0] + ',' + option[1] + ']'}>
-                                        {option[0] * option[1]} ({option[0]} x {option[1]})
-                                    </option>
+                                    <OverlayTrigger key={i}
+                                                    placement="right"
+                                                    overlay={popover(option[1], option[0])}>
+                                        <Dropdown.Item
+                                            eventKey={'[' + option[0] + ',' + option[1] + ']'}>
+                                            {option[0] * option[1]} ({option[0]} x {option[1]})
+                                        </Dropdown.Item>
+                                    </OverlayTrigger>
                                 ))}
-                            </Form.Select>
-                            <Form.Label htmlFor="tileCount">Tile Count</Form.Label>
-                        </div>
+                            </Dropdown.Menu>
+                        </Dropdown>
 
-                        <Button variant='primary' className='btn-xl ms-2 ms-sm-3'
+                        <Button variant='primary' className='btn-xl ms-2 ms-md-3'
                                 onClick={handleShowPlayers}>
                             <FaUsers className='lead'/>
                             <span className='d-none d-md-inline ms-2'>Players (optional)</span>
                         </Button>
 
-                        <div className='ms-2 ms-sm-3'>
+                        <div className='ms-2 ms-md-3'>
                             <Form.Group>
                                 <Form.Check type="checkbox" id='grayscaleCheckbox' label="Gray"
                                             defaultChecked={props.grayscale}
