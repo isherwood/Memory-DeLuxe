@@ -1,5 +1,5 @@
 import React, {useEffect, useRef, useState} from "react";
-import {Button, Col, Form, Row} from 'react-bootstrap';
+import {Button, Col, Form, Row, Toast, ToastContainer} from 'react-bootstrap';
 import ButtonWithConfirm from "../ButtonWithConfirm/ButtonWithConfirm";
 import {FaPlay, FaStop, FaUserMinus, FaUserPlus, FaUsers} from "react-icons/fa";
 import {IoGridSharp} from "react-icons/io5";
@@ -16,6 +16,8 @@ const GameConfig = props => {
     const imageInputRef = useRef(null);
     const [tileCount, setTileCount] = useState(props.gridDimensions[0] * props.gridDimensions[1]);
     const [startButtonEnabled, setStartButtonEnabled] = useState(false);
+    const [toastMessage, setToastMessage] = useState('');
+    const [showToast, setShowToast] = useState(false);
 
     const gridOptions = [
         [2, 3], [3, 2],
@@ -58,13 +60,20 @@ const GameConfig = props => {
     }
 
     const handleAddImage = () => {
-        const trimmedImageUrl = imageUrl.trim();
-        const imageValid = isValidUrl(trimmedImageUrl);
+        const imageValid = imageUrl && isValidUrl(imageUrl);
 
-        if (imageValid && !props.customImages.filter(image => image.url === trimmedImageUrl).length > 0) {
-            props.addCustomImage(trimmedImageUrl);
-            setImageUrl('');
-            imageInputRef.current.focus();
+        if (!imageValid) {
+            setToastMessage('Please enter a valid, secure image address.');
+            setShowToast(true);
+        } else {
+            if (props.customImages.filter(image => image.url === imageUrl).length > 0) {
+                setToastMessage('Please enter a unique image address.');
+                setShowToast(true);
+            } else {
+                props.addCustomImage(imageUrl);
+                setImageUrl('');
+                imageInputRef.current.focus();
+            }
         }
     }
 
@@ -79,10 +88,8 @@ const GameConfig = props => {
     }
 
     const handleAddPlayer = () => {
-        const trimmedName = name.trim();
-
-        if (name && !props.players.filter(player => player.name === trimmedName).length > 0) {
-            props.addPlayer(trimmedName);
+        if (name && !props.players.filter(player => player.name === name).length > 0) {
+            props.addPlayer(name);
             setName('');
             nameInputRef.current.focus();
         }
@@ -267,6 +274,8 @@ const GameConfig = props => {
 
                                         <img src={image.url} alt=''
                                              onError={({currentTarget}) => {
+                                                 setToastMessage("That image didn't load properly.");
+                                                 setShowToast(true);
                                                  currentTarget.src = warningTriangle;
                                              }}
                                              className='custom-image-thumb ms-auto'/>
@@ -325,6 +334,13 @@ const GameConfig = props => {
                     ))}
                 </div>
             }
+
+            <ToastContainer className="pt-3" position='top-center'>
+                <Toast onClose={() => setShowToast(false)} show={showToast} delay={3000} bg='warning'
+                       animation={true} autohide>
+                    <Toast.Body>{toastMessage}</Toast.Body>
+                </Toast>
+            </ToastContainer>
         </>
     );
 }
