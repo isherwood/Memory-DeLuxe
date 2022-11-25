@@ -90,6 +90,15 @@
     cursor: default;
 }
 
+.dark-mode {
+    background: #555;
+    color: #ddd;
+}
+
+.dark-mode select + label {
+    color: initial;
+}
+
 @keyframes rotate {
     0% {
         transform: rotate(0deg);
