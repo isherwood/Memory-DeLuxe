@@ -1,7 +1,7 @@
 import React, {useEffect, useRef, useState} from "react";
 import {Button, Col, Form, Row} from 'react-bootstrap';
 import ButtonWithConfirm from "../ButtonWithConfirm/ButtonWithConfirm";
-import {FaMoon, FaPlay, FaStop, FaUserMinus, FaUserPlus, FaUsers} from "react-icons/fa";
+import {FaMoon, FaPlay, FaStop, FaSun, FaUserMinus, FaUserPlus, FaUsers} from "react-icons/fa";
 import {IoMdColorPalette} from "react-icons/io";
 import {MdBlurOn} from "react-icons/md";
 
@@ -142,7 +142,8 @@ const GameConfig = props => {
                             <ButtonWithConfirm variant="danger"
                                                value={<>
                                                    <FaStop className='lead'/>
-                                                   <span className='d-none d-md-inline ms-1 ms-sm-2 ms-md-3'>End Game</span>
+                                                   <span
+                                                       className='d-none d-md-inline ms-1 ms-sm-2 ms-md-3'>End Game</span>
                                                </>}
                                                classes={'btn-xl' + (!props.gameLocked ? ' d-none' : '')}
                                                modalBody={<>Are you sure you want to end the game?</>}
@@ -150,10 +151,20 @@ const GameConfig = props => {
                         </>
                     }
 
-                    <button className='btn btn-dark btn-xl ms-1 ms-sm-2 ms-md-3'
+                    <button className={'btn btn-xl ms-1 ms-sm-2 ms-md-3' + (!props.darkMode ? ' btn-dark' : ' btn-secondary')}
                             onClick={props.onDarkModeButtonClick}>
-                        <FaMoon className='lead'/>
-                        <span className='d-none d-md-inline ms-2'>Dark Mode</span>
+                        {props.darkMode &&
+                            <>
+                                <FaSun className='lead'/>
+                                <span className='d-none d-md-inline ms-2'>Light Mode</span>
+                            </>
+                        }
+                        {!props.darkMode &&
+                            <>
+                                <FaMoon className='lead'/>
+                                <span className='d-none d-md-inline ms-2'>Dark Mode</span>
+                            </>
+                        }
                     </button>
                 </div>
             </div>

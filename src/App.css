@@ -5,3 +5,11 @@
 .shadow.shadow-dark {
     box-shadow: 0 .5rem 1rem rgba(0, 0, 0, .75) !important;
 }
+
+.app-container .form-select {
+    background-color: #ddd;
+}
+
+.app-container.dark-mode .form-select {
+    background-color: #ccc;
+}
