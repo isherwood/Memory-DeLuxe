@@ -303,20 +303,24 @@ function App() {
             const httpRequest = new XMLHttpRequest();
             httpRequest.onreadystatechange = () => {
                 if (httpRequest.readyState === XMLHttpRequest.DONE && httpRequest.status === 200) {
-                    const config = JSON.parse(httpRequest.responseText);
+                    try {
+                        const config = JSON.parse(httpRequest.responseText);
 
-                    if (config.gridDimensions && config.tiles) {
-                        setCustomConfig(true);
-                        setGridDimensions(config.gridDimensions);
+                        if (config.gridDimensions && config.tiles) {
+                            setCustomConfig(true);
+                            setGridDimensions(config.gridDimensions);
 
-                        // add the tiles twice
-                        let allTiles = config.tiles;
-                        allTiles = shuffle(allTiles.concat(config.tiles));
-                        allTiles = allTiles.map(tile => {
-                            return {...tile, id: Math.random()}
-                        })
+                            // add the tiles twice
+                            let allTiles = config.tiles;
+                            allTiles = shuffle(allTiles.concat(config.tiles));
+                            allTiles = allTiles.map(tile => {
+                                return {...tile, id: Math.random()}
+                            })
 
-                        setTiles(allTiles);
+                            setTiles(allTiles);
+                        }
+                    } catch (e) {
+                        console.log('Config not found.');
                     }
                 }
             };

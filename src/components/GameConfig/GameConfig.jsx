@@ -147,7 +147,7 @@ const GameConfig = props => {
     return (
         <>
             <div id='config' className='d-flex align-items-center mt-3'>
-                {!props.gameLocked &&
+                {!props.gameLocked && !props.customConfig &&
                     <>
                         <Dropdown size='lg' className='btn-xl tile-count-selector'
                                   disabled={props.gameLocked}
