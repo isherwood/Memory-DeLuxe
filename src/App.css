@@ -1,4 +1,4 @@
-.btn.btn-xl {
+.btn.btn-xl, .btn-xl button {
     padding: 1rem;
 }
 
@@ -12,4 +12,21 @@
 
 .app-container.dark-mode .form-select {
     background-color: #ccc;
+}
+
+.tile-count-selector .dropdown-menu {
+    max-height: calc(100vh - 100px);
+    overflow: auto;
+}
+
+.tile-grid-preview-popover .popover-body {
+    padding: .5rem;
+}
+
+.tile-grid-preview-popover .popover-arrow {
+    display: none !important;
+}
+
+.tile-grid-preview-tile {
+    margin: 1px;
 }
