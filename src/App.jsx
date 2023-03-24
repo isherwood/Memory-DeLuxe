@@ -20,6 +20,7 @@ function App() {
     const [grayscale, setGrayscale] = useState(false);
     const [blur, setBlur] = useState(false);
     const [darkMode, setDarkMode] = useState(false);
+    const [customConfig, setCustomConfig] = useState(false);
 
     const shuffle = array => {
         for (let i = array.length - 1; i > 0; i--) {
@@ -104,12 +105,25 @@ function App() {
         setGameLocked(false);
         setGuessCount(0);
 
-        // reset grid to current dimensions to fetch new images
-        const currentGridDimensions = gridDimensions;
-        setGridDimensions([0, 0]);
-        setTimeout(() => {
-            setGridDimensions(currentGridDimensions);
-        });
+        if (customConfig) {
+            let clearedTiles = tiles;
+
+            tiles.forEach((tile, i) => {
+                clearedTiles[i]['shown'] = false;
+                clearedTiles[i]['matched'] = false;
+            });
+
+            clearedTiles = shuffle(clearedTiles);
+
+            setTiles(clearedTiles);
+        } else {
+            // reset grid to current dimensions to fetch new images
+            const currentGridDimensions = gridDimensions;
+            setGridDimensions([0, 0]);
+            setTimeout(() => {
+                setGridDimensions(currentGridDimensions);
+            });
+        }
 
         // zero scores & set the first player as active
         setPlayers(current => current.map(obj => {
@@ -206,45 +220,47 @@ function App() {
 
     // initialize tiles
     useEffect(() => {
-        const getTiles = count => {
-            setTiles([]);
-            let newTiles = [];
+        if (!customConfig) {
+            const getTiles = count => {
+                setTiles([]);
+                let newTiles = [];
 
-            [...Array(count)].forEach((v, i) => {
-                const seed = Math.floor(Math.random() * 99999) + 1;
-                let imgUrl = 'https://picsum.photos/seed/' + seed + '/600/400';
+                [...Array(count)].forEach((v, i) => {
+                    const seed = Math.floor(Math.random() * 99999) + 1;
+                    let imgUrl = 'https://picsum.photos/seed/' + seed + '/600/400';
 
-                if (grayscale && blur) {
-                    imgUrl += '?grayscale&blur=10';
-                } else if (grayscale) {
-                    imgUrl += '?grayscale';
-                } else if (blur) {
-                    imgUrl += '?blur=10';
-                }
+                    if (grayscale && blur) {
+                        imgUrl += '?grayscale&blur=10';
+                    } else if (grayscale) {
+                        imgUrl += '?grayscale';
+                    } else if (blur) {
+                        imgUrl += '?blur=10';
+                    }
 
-                // add each image twice
-                newTiles.push({
-                    id: i + 'a',
-                    url: imgUrl,
-                    shown: false,
-                    matched: false
+                    // add each image twice
+                    newTiles.push({
+                        id: i + 'a',
+                        url: imgUrl,
+                        shown: false,
+                        matched: false
+                    });
+                    newTiles.push({
+                        id: i + 'b',
+                        url: imgUrl,
+                        shown: false,
+                        matched: false
+                    });
                 });
-                newTiles.push({
-                    id: i + 'b',
-                    url: imgUrl,
-                    shown: false,
-                    matched: false
-                });
-            });
 
-            newTiles = shuffle(newTiles);
-            setTiles(newTiles);
-        }
+                newTiles = shuffle(newTiles);
+                setTiles(newTiles);
+            }
 
-        if (Array.isArray(gridDimensions)) {
-            getTiles((gridDimensions[0] * gridDimensions[1] / 2));
+            if (Array.isArray(gridDimensions)) {
+                getTiles((gridDimensions[0] * gridDimensions[1] / 2));
+            }
         }
-    }, [blur, grayscale, gridDimensions]);
+    }, [blur, customConfig, grayscale, gridDimensions]);
 
     // set active player
     useEffect(() => {
@@ -278,6 +294,37 @@ function App() {
         }
     }, [tiles]);
 
+    // use an existing configuration provided in the URL
+    useEffect(() => {
+        const params = new URLSearchParams(window.location.search);
+        const configId = params.get('c');
+
+        if (configId) {
+            const httpRequest = new XMLHttpRequest();
+            httpRequest.onreadystatechange = () => {
+                if (httpRequest.readyState === XMLHttpRequest.DONE && httpRequest.status === 200) {
+                    const config = JSON.parse(httpRequest.responseText);
+
+                    if (config.gridDimensions && config.tiles) {
+                        setCustomConfig(true);
+                        setGridDimensions(config.gridDimensions);
+
+                        // add the tiles twice
+                        let allTiles = config.tiles;
+                        allTiles = shuffle(allTiles.concat(config.tiles));
+                        allTiles = allTiles.map(tile => {
+                            return {...tile, id: Math.random()}
+                        })
+
+                        setTiles(allTiles);
+                    }
+                }
+            };
+            httpRequest.open("GET", "config/" + configId + ".json", true);
+            httpRequest.send();
+        }
+    }, []);
+
     return (
         <Container fluid className={'app-container d-flex flex-column vh-100'
             + (gameLocked ? ' game-locked' : '')
@@ -304,7 +351,8 @@ function App() {
                     blur={blur}
                     onSetBlur={val => setBlur(val)}
                     darkMode={darkMode}
-                    onDarkModeButtonClick={handleDarkModeButtonClick}/>
+                    onDarkModeButtonClick={handleDarkModeButtonClick}
+                    customConfig={customConfig}/>
             </Row>
 
             <Row className='flex-fill'>

@@ -183,27 +183,29 @@ const GameConfig = props => {
                             <span className='d-none d-md-inline ms-2'>Players (optional)</span>
                         </Button>
 
-                        <div className='ms-2 ms-md-3'>
-                            <Form.Group>
-                                <Form.Check type="checkbox" id='grayscaleCheckbox'
-                                            label={<>
-                                                <span className='d-none d-md-inline'>Gray</span>
-                                                <IoMdColorPalette className='d-md-none'/>
-                                            </>}
-                                            defaultChecked={props.grayscale}
-                                            onClick={e => props.onSetGrayscale(e.currentTarget.checked)}></Form.Check>
-                            </Form.Group>
+                        {!props.customConfig &&
+                            <div className='ms-2 ms-md-3'>
+                                <Form.Group>
+                                    <Form.Check type="checkbox" id='grayscaleCheckbox'
+                                                label={<>
+                                                    <span className='d-none d-md-inline'>Gray</span>
+                                                    <IoMdColorPalette className='d-md-none'/>
+                                                </>}
+                                                defaultChecked={props.grayscale}
+                                                onClick={e => props.onSetGrayscale(e.currentTarget.checked)}></Form.Check>
+                                </Form.Group>
 
-                            <Form.Group>
-                                <Form.Check type="checkbox" id='blurCheckbox'
-                                            label={<>
-                                                <span className='d-none d-md-inline'>Blur</span>
-                                                <MdBlurOn className='d-md-none'/>
-                                            </>}
-                                            defaultChecked={props.blur}
-                                            onClick={e => props.onSetBlur(e.currentTarget.checked)}></Form.Check>
-                            </Form.Group>
-                        </div>
+                                <Form.Group>
+                                    <Form.Check type="checkbox" id='blurCheckbox'
+                                                label={<>
+                                                    <span className='d-none d-md-inline'>Blur</span>
+                                                    <MdBlurOn className='d-md-none'/>
+                                                </>}
+                                                defaultChecked={props.blur}
+                                                onClick={e => props.onSetBlur(e.currentTarget.checked)}></Form.Check>
+                                </Form.Group>
+                            </div>
+                        }
                     </>
                 }
 
