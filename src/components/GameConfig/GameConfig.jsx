@@ -147,35 +147,37 @@ const GameConfig = props => {
     return (
         <>
             <div id='config' className='d-flex align-items-center mt-3'>
-                {!props.gameLocked && !props.customConfig &&
+                {!props.gameLocked &&
                     <>
-                        <Dropdown size='lg' className='btn-xl tile-count-selector'
-                                  disabled={props.gameLocked}
-                                  value={JSON.stringify(props.gridDimensions)}
-                                  onSelect={handleCountChange}>
-                            <Dropdown.Toggle variant="primary">
-                                <IoGridSharp className='lead me-2'/>
-                                <span className='d-none d-md-inline me-1'>
+                        {!props.customConfig &&
+                            <Dropdown size='lg' className='btn-xl tile-count-selector'
+                                      disabled={props.gameLocked}
+                                      value={JSON.stringify(props.gridDimensions)}
+                                      onSelect={handleCountChange}>
+                                <Dropdown.Toggle variant="primary">
+                                    <IoGridSharp className='lead me-2'/>
+                                    <span className='d-none d-md-inline me-1'>
                                     {props.gridDimensions[0] === 0 && props.gridDimensions[1] === 0
                                         ? 'Tile Count'
                                         : `${props.gridDimensions[0]} × ${props.gridDimensions[1]}`
                                     }
                                 </span>
-                            </Dropdown.Toggle>
+                                </Dropdown.Toggle>
 
-                            <Dropdown.Menu>
-                                {gridOptions.map((option, i) => (
-                                    <OverlayTrigger key={i}
-                                                    placement="right"
-                                                    overlay={popover(option[1], option[0])}>
-                                        <Dropdown.Item
-                                            eventKey={'[' + option[0] + ',' + option[1] + ']'}>
-                                            {option[0] * option[1]} ({option[0]} x {option[1]})
-                                        </Dropdown.Item>
-                                    </OverlayTrigger>
-                                ))}
-                            </Dropdown.Menu>
-                        </Dropdown>
+                                <Dropdown.Menu>
+                                    {gridOptions.map((option, i) => (
+                                        <OverlayTrigger key={i}
+                                                        placement="right"
+                                                        overlay={popover(option[1], option[0])}>
+                                            <Dropdown.Item
+                                                eventKey={'[' + option[0] + ',' + option[1] + ']'}>
+                                                {option[0] * option[1]} ({option[0]} x {option[1]})
+                                            </Dropdown.Item>
+                                        </OverlayTrigger>
+                                    ))}
+                                </Dropdown.Menu>
+                            </Dropdown>
+                        }
 
                         <Button variant='primary' className='btn-xl ms-2 ms-md-3'
                                 onClick={handleShowPlayers}>
