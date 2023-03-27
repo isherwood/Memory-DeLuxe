@@ -179,7 +179,7 @@ const GameConfig = props => {
                             </Dropdown>
                         }
 
-                        <Button variant='primary' className='btn-xl ms-2 ms-md-3'
+                        <Button variant='primary' className={'btn-xl ' + (!props.customConfig && 'ms-2 ms-md-3')}
                                 onClick={handleShowPlayers}>
                             <FaUsers className='lead'/>
                             <span className='d-none d-md-inline ms-2'>Players (optional)</span>

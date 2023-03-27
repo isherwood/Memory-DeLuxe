@@ -313,11 +313,24 @@ function App() {
                             // add the tiles twice
                             let allTiles = config.tiles;
                             allTiles = shuffle(allTiles.concat(config.tiles));
+
+                            // give the tiles unique IDs
                             allTiles = allTiles.map(tile => {
-                                return {...tile, id: Math.random()}
-                            })
+                                return {...tile, id: Math.random()};
+                            });
 
                             setTiles(allTiles);
+
+                            if (config.players) {
+                                let players = config.players;
+
+                                // set all players' scores to zero
+                                players = players.map(player => {
+                                    return {...player, score: 0};
+                                });
+
+                                setPlayers(players);
+                            }
                         }
                     } catch (e) {
                         console.log('Config not found.');
